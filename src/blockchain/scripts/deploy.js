@@ -9,18 +9,14 @@ const fs = require("fs");
 
 async function main() {
   const JobPortal = await hre.ethers.getContractFactory("JobPortal");
-  const test = await hre.ethers.getContractFactory("TaskBidding");
 
   const jobPortal = await JobPortal.deploy();
-  const testContract = await test.deploy();
 
   await jobPortal.deployed();
-  await testContract.deployed();
 
   fs.writeFileSync(
     "./config.js",
-    `export const contractAddress = "${jobPortal.address}";
-    export const testAddress = "${testContract.address}";`
+    `export const contractAddress = "${jobPortal.address}";`
   );
 
 }
