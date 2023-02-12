@@ -1,8 +1,0 @@
-0000000000000000000000000000000000000000 96cdc765c88bdb07dc0377e1d179be78af803a40 pranavvdesai <pranavdesai.psd@gmail.com> 1675707979 +0530	clone: from https://github.com/sahas-01/web3-freelance.git
-96cdc765c88bdb07dc0377e1d179be78af803a40 3c79ed14e87990451f550b004bf99142da96c01d pranavvdesai <pranavdesai.psd@gmail.com> 1675958488 +0530	pull: Fast-forward
-3c79ed14e87990451f550b004bf99142da96c01d b82a2fcd5949154eb3a90446cb6342eb979e00bb pranavvdesai <pranavdesai.psd@gmail.com> 1676137124 +0530	pull: Fast-forward
-b82a2fcd5949154eb3a90446cb6342eb979e00bb e39e8ba874301bcb4face964083dc664ff592852 pranavvdesai <pranavdesai.psd@gmail.com> 1676137793 +0530	commit: init smart contract
-e39e8ba874301bcb4face964083dc664ff592852 12aa76d2a21d8c9836d615e7961fe19f17d5cf13 pranavvdesai <pranavdesai.psd@gmail.com> 1676194067 +0530	commit: feat: getter functions
-12aa76d2a21d8c9836d615e7961fe19f17d5cf13 9299899f54c41e0415884f4341c81e3ceaf1756b pranavvdesai <pranavdesai.psd@gmail.com> 1676194074 +0530	pull --tags origin main: Merge made by the 'recursive' strategy.
-9299899f54c41e0415884f4341c81e3ceaf1756b 1643cc3b86906fe81053a261875902fc0f96ac9a pranavvdesai <pranavdesai.psd@gmail.com> 1676206269 +0530	pull origin main: Fast-forward
-1643cc3b86906fe81053a261875902fc0f96ac9a b72b3eb770646d64e52de4e26ddf4bc816d6d4dc pranavvdesai <pranavdesai.psd@gmail.com> 1676206392 +0530	commit (merge): resolved conflicts
