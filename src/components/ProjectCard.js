@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
@@ -8,7 +9,7 @@ const ProjectCard = () => {
             <div className="flex py-7 px-3 border-2 border-slate-700 rounded-xl m-5 cursor-pointer hover:opacity-80 hover:shadow-lg hover:bg-zinc-700 pr-4 transition duration-500 ease-in hover:border-none">
                 {/* Just for image div-LHS */}
                 <div className="relative h-24 w-40 md:h-52 md:w-80 flex-shrink-0">
-                    Some img
+                    <Image src="https://links.papareact.com/3pn" layout="fill" objectFit="cover" className="rounded-2xl" />
                 </div>
                 {/* Content div-RHS */}
                 <div className='flex flex-col flex-grow pl-5'>

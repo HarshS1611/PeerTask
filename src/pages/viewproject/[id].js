@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import Header from '@/components/Header'
-import Preferences from '@/components/Tasks'
 import Head from "next/head"
 import Link from 'next/link'
 
 const ProjectInfo = () => {
     const router = useRouter()
     const { id } = router.query
-    const [preferences, setPreferences] = useState([{ price: "", task_name: "" }]);
 
     return (
         <>
@@ -106,7 +104,7 @@ const ProjectInfo = () => {
                                     Pending
                                 </span>
                             </td>
-                            <Link href={`/viewtask/${id}`}>
+                            <Link href={`/task/${id}`}>
                                 <button className="bg-[#1a1e27] text-white border border-white rounded-md px-4 py-2 text-sm font-medium hover:bg-white hover:text-black m-3">View more</button>
                             </Link>
                         </tr>
