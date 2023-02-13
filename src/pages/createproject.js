@@ -1,27 +1,12 @@
 import Header from '@/components/Header'
 import { useState } from 'react'
 import Head from 'next/head'
-import { create as ipfsClient } from "ipfs-http-client";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
-// import JobPortal from "../blockchain/artifacts/contracts/Test.sol/TaskBidding.json";
-// import { Web3Storage } from 'web3.storage'
+import uploadToIPFS from '../utils/ipfs'
 
-const projectId = '2LdCDYA3OWJzTWs1x774mhFTh5o'
-const projectSecret = '0f7c710c31dc3c142dfbb92778ad941d'
-const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
-
-const client = ipfsClient({
-    host: 'ipfs.infura.io',
-    port: 5001,
-    protocol: 'https',
-    apiPath: '/api/v0',
-    headers: {
-        authorization: auth
-    }
-})
 
 export default function CreateProject() {
     const [projectData, setProjectData] = useState({
@@ -38,21 +23,6 @@ export default function CreateProject() {
         // updatedAt: '',
     })
 
-    // async function uplaodDataToWeb3Storage(data) {
-    //     console.log(data)
-    //     const client = new Web3Storage({ token: process.env.WEB3STORAGE_API_KEY })
-    //     const cid = await client.put(data)
-    //     console.log(cid)
-    //     return cid
-    // }
-
-    async function uploadToIPFS(Jdata) {
-        const data = JSON.stringify(Jdata)
-        const { cid } = await client.add(data)
-        console.log(cid)
-        return cid
-    }
-
     async function createProject() {
         const { title, description, category, skills, image, duration } = projectData
         if (!title || !description || !category || !skills || !image || !duration) return
@@ -64,8 +34,8 @@ export default function CreateProject() {
 
 
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
-            const dataCid = await uploadToIPFS(projectData);
-            const tx = await jobPortal.createProject(dataCid);
+            const uri = await uploadToIPFS(projectData);
+            const tx = await jobPortal.createProject(uri);
             await tx.wait();
             console.log("Project created!");
         } catch (err) {

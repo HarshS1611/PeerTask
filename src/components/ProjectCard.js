@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-const ProjectCard = () => {
+export default function ProjectCard() {
     const id = 123123123123
     return (
         <Link href={`/viewproject/${id}`}>
@@ -38,4 +38,3 @@ const ProjectCard = () => {
     )
 }
 
-export default ProjectCard
