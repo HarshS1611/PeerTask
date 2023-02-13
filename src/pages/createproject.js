@@ -5,6 +5,7 @@ import { create as ipfsClient } from "ipfs-http-client";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
+import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 // import JobPortal from "../blockchain/artifacts/contracts/Test.sol/TaskBidding.json";
 // import { Web3Storage } from 'web3.storage'
 
