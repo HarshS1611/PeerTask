@@ -1,9 +1,61 @@
 import Head from 'next/head'
-import { Inter } from '@next/font/google'
 import Header from '@/components/Header'
 import MyProjectCard from '@/components/MyProjectCard'
+import { useState, useEffect } from 'react'
+import Web3Modal from "web3modal";
+import { contractAddress } from "../blockchain/config";
+import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import axios from 'axios';
+import { ethers } from "ethers";
 
 export default function Home() {
+
+    // On screen load get projects count
+    const [projectsData, setProjectsData] = useState([]);
+
+    useEffect(() => {
+        async function getProjects() {
+            let projectsArr = [];
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.providers.Web3Provider(connection);
+            const signer = provider.getSigner();
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            const cnt = await jobPortal.getCurrentProjectId();
+            for (let i = 0; i <= cnt.toNumber(); i++) {
+                projectsArr.push(i);
+            }
+
+            const data = await Promise.all(projectsArr.map(async (p) => {
+                const project = await jobPortal.projects(p);
+                // get the address of the signer
+                console.log(signer)
+                if (project[2] == await signer.getAddress()) {
+                    const meta = await axios.get(project[0])
+                    console.log(meta)
+                    // convert the array to object
+                    const projectObj = {
+                        uri: project[0],
+                        id: project[1].toNumber(),
+                        manager: project[2],
+                        taskCount: project[3].toNumber(),
+                        title: meta.data.title,
+                        skills: meta.data.skills,
+                        image: meta.data.image,
+                        duration: meta.data.duration,
+                        description: meta.data.description,
+                        category: meta.data.category
+                    }
+                    return projectObj;
+                }
+            }))
+            setProjectsData(data);
+            console.log(data)
+        }
+        getProjects();
+
+    }, []);
+
     return (
         <>
             <Head>
@@ -16,9 +68,10 @@ export default function Home() {
             <section className="bg-black text-white pb-10 px-10">
                 <div className="max-w-5xl mx-auto">
                     <h1 className="text-2xl font-semibold my-10 md:ml-5">My Projects</h1>
-                    <MyProjectCard />
-                    <MyProjectCard />
-                    <MyProjectCard />
+                    {projectsData.map((p, index) => (
+                        <MyProjectCard key={index} project={p} />
+                    ))}
+
 
                 </div>
             </section>
