@@ -28,6 +28,17 @@ contract JobPortal{
         string motivation;
     }
 
+    struct Person {
+        string personURI;
+        uint id;
+        string name;
+        string wallet_address;
+        string description;
+        uint rating;
+        uint total_projects;
+        uint total_tasks;
+    }
+
     mapping(uint => Project) public projects; //Project[] public projects;
     uint public projectCount;
     
