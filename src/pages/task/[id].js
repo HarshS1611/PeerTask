@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import Header from '@/components/Header'
-import Preferences from '@/components/Tasks'
+// import Preferences from '@/components/Tasks'
 import Head from "next/head"
 import ProposalModal from '@/components/ProposalModal'
 import TaskSubmitModal from '@/components/TaskSubmitModal'
