@@ -1,17 +1,41 @@
 import React from 'react'
+import Web3Modal from "web3modal";
+import { ethers } from "ethers";
+import { contractAddress } from "../blockchain/config";
+import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { uploadToIPFS, client } from '../utils/ipfs'
+
 
 const Modal = ({
     setModalOpen,
-    taskName,
-    setTaskName,
-    taskDescription,
-    setTaskDescription,
-    taskPrice,
-    setTaskPrice,
-    taskDuration,
-    setTaskDuration,
-    handleAddTask
+    tasksData,
+    setTasksData,
+    id,
+    // handleAddTask
 }) => {
+
+    const handleAddTask = async (e) => {
+        e.preventDefault()
+        console.log(tasksData)
+        if (!tasksData.taskName || !tasksData.taskDescription || !tasksData.stakedAmount || !tasksData.taskDuration) return;
+        try {
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.providers.Web3Provider(connection);
+            const signer = provider.getSigner();
+
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            const uri = await uploadToIPFS({ ...tasksData });
+            console.log(uri)
+            const stakedAmt = ethers.utils.parseEther(tasksData.stakedAmount);
+            const tx = await jobPortal.createTask(id, stakedAmt, uri);
+            await tx.wait();
+            console.log("Task created!");
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+    }
+
     return (
         <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none backdrop-filter backdrop-blur-sm ">
             <div className="relative w-auto my-6 mx-auto">
@@ -36,15 +60,17 @@ const Modal = ({
                                        block h-10 bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-5 mt-2 mb-2 mr-10 text-sm w-full focus:outline-none
                                         transition transform duration-100 ease-out"
                                 required
-                                value={taskName}
-                                onChange={(e) => setTaskName(e.target.value)}
+                                value={
+                                    tasksData.taskName
+                                }
+                                onChange={(e) => setTasksData({ ...tasksData, taskName: e.target.value })}
                             />
                             <label className="block text-white text-sm font-semibold">
                                 Task Description*
                             </label>
                             <textarea
-                                value={taskDescription}
-                                onChange={(e) => setTaskDescription(e.target.value)}
+                                value={tasksData.taskDescription}
+                                onChange={(e) => setTasksData({ ...tasksData, taskDescription: e.target.value })}
 
                                 type="text"
                                 id="description" className='
@@ -58,8 +84,10 @@ const Modal = ({
                             <input type="number" className="shadow appearance-none border rounded w-full text-white
                                        block h-10 bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-5 mt-2 mb-2 mr-10 text-sm w-full focus:outline-none
                                         transition transform duration-100 ease-out"
-                                value={taskPrice}
-                                onChange={(e) => setTaskPrice(e.target.value)}
+                                value={
+                                    tasksData.stakedAmount
+                                }
+                                onChange={(e) => setTasksData({ ...tasksData, stakedAmount: e.target.value })}
                                 required
                                 min={0}
                                 max={100}
@@ -70,8 +98,10 @@ const Modal = ({
                             <input type="number" className="shadow appearance-none border rounded w-full text-white
                                        block h-10 bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-5 mt-2 mb-2 mr-10 text-sm w-full focus:outline-none
                                         transition transform duration-100 ease-out"
-                                value={taskDuration}
-                                onChange={(e) => setTaskDuration(e.target.value)}
+                                value={
+                                    tasksData.taskDuration
+                                }
+                                onChange={(e) => setTasksData({ ...tasksData, taskDuration: e.target.value })}
                                 required
                                 min={0}
                                 max={10}
@@ -84,7 +114,7 @@ const Modal = ({
                         type="submit"
                         onClick={handleAddTask}
                     >
-                        Save
+                        Add Task
                     </button>
 
                 </div>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import Header from '@/components/Header'
-import Tasks from '@/components/Tasks'
 import Head from "next/head"
 import Modal from '@/components/Modal'
 import GoBackbtn from '@/components/GoBackbtn'
@@ -11,29 +10,14 @@ const ProjectInfo = () => {
     const { id } = router.query
     // const [task, setTask] = useState([{ price: "", task_name: "" }]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [taskName, setTaskName] = useState("");
-    const [taskDescription, setTaskDescription] = useState("");
-    const [taskPrice, setTaskPrice] = useState("");
-    const [taskDuration, setTaskDuration] = useState("");
-    const [tasks, setTasks] = useState([]);
-    const handleAddTask = () => {
-        if (tasks.length >= 5) return;
-        setTasks([
-            ...tasks,
-            {
-                name: taskName,
-                description: taskDescription,
-                price: taskPrice,
-                duration: taskDuration,
-            },
-        ]);
-        setModalOpen(false);
-        // Reset the modal values to the default values
-        setTaskName("");
-        setTaskDescription("");
-        setTaskPrice("");
-        setTaskDuration("");
-    };
+    const [tasksData, setTasksData] = useState(
+        {
+            taskName: "",
+            taskDescription: "",
+            stakedAmount: "",
+            taskDuration: "",
+        }
+    )
 
     const handleDeleteTask = (index) => {
         const newTasks = [...tasks];
@@ -44,6 +28,7 @@ const ProjectInfo = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(tasks);
+
     };
     return (
         <>
@@ -106,15 +91,11 @@ const ProjectInfo = () => {
                 {modalOpen && (
                     <Modal
                         setModalOpen={setModalOpen}
-                        taskName={taskName}
-                        setTaskName={setTaskName}
-                        taskDescription={taskDescription}
-                        setTaskDescription={setTaskDescription}
-                        taskPrice={taskPrice}
-                        setTaskPrice={setTaskPrice}
-                        taskDuration={taskDuration}
-                        setTaskDuration={setTaskDuration}
-                        handleAddTask={handleAddTask}
+                        tasksData={tasksData}
+                        setTasksData={setTasksData}
+                        handleSubmit={handleSubmit}
+                        id={id}
+                    // handleAddTask={handleAddTask}
                     />
 
                 )}
@@ -128,8 +109,8 @@ const ProjectInfo = () => {
                             <th className="p-4"></th>
                         </tr>
                     </thead>
-                    <tbody className="bg-[#1a1e27]">
-                        {tasks.map((task, index) => (
+                    {/* <tbody className="bg-[#1a1e27]">
+                        {tasksData.map((task, index) => (
                             <tr key={index} className="text-sm text-white m-20">
                                 <td className="p-4">{task.name}</td>
                                 <td className="p-4">{task.description}</td>
@@ -140,7 +121,7 @@ const ProjectInfo = () => {
                                 </td>
                             </tr>
                         ))}
-                    </tbody>
+                    </tbody> */}
                 </table>
                 <button className="bg-[#0284c7] text-white text-lg px-5 py-2 rounded-xl mt-5" onClick={handleSubmit}>Submit</button>
             </section>

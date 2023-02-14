@@ -33,6 +33,7 @@ export default function Home() {
                 if (project[2] == await signer.getAddress()) {
                     const meta = await axios.get(project[0])
                     console.log(meta)
+                    console.log(meta.data)
                     // convert the array to object
                     const projectObj = {
                         uri: project[0],
@@ -69,7 +70,7 @@ export default function Home() {
                 <div className="max-w-5xl mx-auto">
                     <h1 className="text-2xl font-semibold my-10 md:ml-5">My Projects</h1>
                     {projectsData.map((p, index) => (
-                        <MyProjectCard key={index} project={p} />
+                        p && <MyProjectCard key={index} project={p} />
                     ))}
 
 
