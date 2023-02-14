@@ -3,13 +3,14 @@ import React from 'react'
 import Image from 'next/image'
 
 const MyProjectCard = ({ project }) => {
-    console.log(project.image)
+    // console.log(project.image)
+    console.log(project)
     return (
 
         <div className="flex py-7 px-3 border-2 border-slate-700 rounded-xl m-5 hover:opacity-90 hover:shadow-lg pr-4 transition duration-500 ease-in">
             {/* Just for image div-LHS */}
             <div className="relative h-24 w-40 md:h-52 md:w-80 flex-shrink-0">
-                <Image src={project.image} alt="img" layout="fill" objectFit="cover" />
+                <Image src={project.image} layout="fill" objectFit="cover" className="rounded-2xl" />
             </div>
             {/* Content div-RHS */}
             <div className='flex flex-col flex-grow pl-5'>
