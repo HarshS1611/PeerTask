@@ -38,8 +38,14 @@ contract JobPortal{
     event TaskCompleted(uint projectId, uint taskId);
     event ReviewCompleted(uint projectId, uint taskId);
     event PaymentReleased(uint projectId, uint taskId, address worker, uint amount);
+    
+    receive() external payable {}
 
-     function createProject(string calldata projectURI) public {
+    function getBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function createProject(string calldata projectURI) public {
         projects[projectCount].projectURI = projectURI;
         projects[projectCount].projectId = projectCount;
         projects[projectCount].projectManager = msg.sender;
@@ -73,7 +79,7 @@ contract JobPortal{
     }
 
 
-    function createTask(uint projectId, uint stakedAmount, string calldata taskURI) public {
+    function createTask(uint projectId, uint stakedAmount, string calldata taskURI) public payable {
         require(msg.sender == projects[projectId].projectManager, "Only project manager can create tasks");
 
         projects[projectId].tasks[projects[projectId].taskCount].taskURI = taskURI;
@@ -82,6 +88,10 @@ contract JobPortal{
         projects[projectId].tasks[projects[projectId].taskCount].completed = false;
         projects[projectId].tasks[projects[projectId].taskCount].reviewed = false;
         projects[projectId].taskCount++;
+
+        (bool sent, bytes memory data) = (address(this)).call{value: msg.value}("");
+
+        require(sent, "Not sent");
 
         emit NewTask(projectId, projects[projectId].taskCount-1, stakedAmount, taskURI);
     }

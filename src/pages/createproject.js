@@ -1,28 +1,17 @@
 import Header from '@/components/Header'
 import { useState } from 'react'
 import Head from 'next/head'
-import { create as ipfsClient } from "ipfs-http-client";
 import Web3Modal from "web3modal";
+import { Auth, useAuth } from "@arcana/auth-react";
+
 import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
-import JobPortal from "../blockchain/artifacts/contracts/Test.sol/TaskBidding.json";
-// import { Web3Storage } from 'web3.storage'
+import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { uploadToIPFS, client } from '../utils/ipfs'
 
-const projectId = '2LdCDYA3OWJzTWs1x774mhFTh5o'
-const projectSecret = '0f7c710c31dc3c142dfbb92778ad941d'
-const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
-
-const client = ipfsClient({
-    host: 'ipfs.infura.io',
-    port: 5001,
-    protocol: 'https',
-    apiPath: '/api/v0',
-    headers: {
-        authorization: auth
-    }
-})
 
 export default function CreateProject() {
+    const [fileUrl, setFileUrl] = useState(null);
     const [projectData, setProjectData] = useState({
         title: '',
         description: '',
@@ -37,34 +26,40 @@ export default function CreateProject() {
         // updatedAt: '',
     })
 
-    // async function uplaodDataToWeb3Storage(data) {
-    //     console.log(data)
-    //     const client = new Web3Storage({ token: process.env.WEB3STORAGE_API_KEY })
-    //     const cid = await client.put(data)
-    //     console.log(cid)
-    //     return cid
-    // }
-
-    async function uploadToIPFS(Jdata) {
-        const data = JSON.stringify(Jdata)
-        const { cid } = await client.add(data)
-        console.log(cid)
-        return cid
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
+    async function onChange(e) {
+        const file = e.target.files[0];
+        try {
+            const added = await client.add(file, {
+                progress: (prog) => console.log(`received: ${prog}`),
+            });
+            const url = `https://peertask.infura-ipfs.io/ipfs/${added.path}`;
+            setFileUrl(url);
+        } catch (error) {
+            console.log("Error uploading file: ", error);
+        }
     }
 
     async function createProject() {
-        const { title, description, category, skills, image, duration } = projectData
-        if (!title || !description || !category || !skills || !image || !duration) return
+        const { title, description, category, skills, duration } = projectData
+        if (!title || !description || !category || !skills || !fileUrl || !duration) return
         try {
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            
 
+            const Provider = new ethers.providers.Web3Provider(provider);
+            const sig = Provider.getSigner();
+            
 
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
-            const dataCid = await uploadToIPFS(projectData);
-            const tx = await jobPortal.createProject(dataCid);
+            console.log(sig)
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
+            const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
+            console.log(uri)
+            const tx = await jobPortal.createProject(uri);
             await tx.wait();
             console.log("Project created!");
         } catch (err) {
@@ -147,8 +142,7 @@ export default function CreateProject() {
                     </div>
                     <div className='flex relative m-0'>
                         <input type="file" placeholder="Image"
-                            value={projectData.image}
-                            onChange={(e) => setProjectData({ ...projectData, image: e.target.value })}
+                            onChange={onChange}
                             id="image" className='block h-12 bg-[#ffffff12] text-white rounded-lg px-2 py-3 border border-slate-600 py-5 mt-5 mb-2 mr-10 text-sm w-full focus:outline-none
                             transition transform duration-100 ease-out
                             ' required />
