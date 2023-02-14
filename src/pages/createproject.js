@@ -5,10 +5,11 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
-import uploadToIPFS from '../utils/ipfs'
+import { uploadToIPFS, client } from '../utils/ipfs'
 
 
 export default function CreateProject() {
+    const [fileUrl, setFileUrl] = useState(null);
     const [projectData, setProjectData] = useState({
         title: '',
         description: '',
@@ -23,9 +24,22 @@ export default function CreateProject() {
         // updatedAt: '',
     })
 
+    async function onChange(e) {
+        const file = e.target.files[0];
+        try {
+            const added = await client.add(file, {
+                progress: (prog) => console.log(`received: ${prog}`),
+            });
+            const url = `https://peertask.infura-ipfs.io/ipfs/${added.path}`;
+            setFileUrl(url);
+        } catch (error) {
+            console.log("Error uploading file: ", error);
+        }
+    }
+
     async function createProject() {
-        const { title, description, category, skills, image, duration } = projectData
-        if (!title || !description || !category || !skills || !image || !duration) return
+        const { title, description, category, skills, duration } = projectData
+        if (!title || !description || !category || !skills || !fileUrl || !duration) return
         try {
             const web3Modal = new Web3Modal();
             const connection = await web3Modal.connect();
@@ -34,7 +48,8 @@ export default function CreateProject() {
 
 
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
-            const uri = await uploadToIPFS(projectData);
+            const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
+            console.log(uri)
             const tx = await jobPortal.createProject(uri);
             await tx.wait();
             console.log("Project created!");
@@ -118,8 +133,7 @@ export default function CreateProject() {
                     </div>
                     <div className='flex relative m-0'>
                         <input type="file" placeholder="Image"
-                            value={projectData.image}
-                            onChange={(e) => setProjectData({ ...projectData, image: e.target.value })}
+                            onChange={onChange}
                             id="image" className='block h-12 bg-[#ffffff12] text-white rounded-lg px-2 py-3 border border-slate-600 py-5 mt-5 mb-2 mr-10 text-sm w-full focus:outline-none
                             transition transform duration-100 ease-out
                             ' required />

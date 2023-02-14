@@ -4,7 +4,7 @@ const projectId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID
 const projectSecret = process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET
 const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
 
-const client = ipfsClient({
+export const client = ipfsClient({
     host: 'ipfs.infura.io',
     port: 5001,
     protocol: 'https',
@@ -14,7 +14,7 @@ const client = ipfsClient({
     }
 })
 
-export default async function uploadToIPFS(Jdata) {
+export async function uploadToIPFS(Jdata) {
     const data = JSON.stringify(Jdata)
     const added = await client.add(data)
     const url = `https://peertask.infura-ipfs.io/ipfs/${added.path}`;
