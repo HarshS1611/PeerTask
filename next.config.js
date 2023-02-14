@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['links.papareact.com'],
+    domains: ['peertask.infura-ipfs.io'],
   },
   reactStrictMode: true,
 }
