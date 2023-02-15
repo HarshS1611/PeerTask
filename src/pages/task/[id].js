@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Header from '@/components/Header'
+import Web3Modal from "web3modal";
+import { contractAddress } from "../../../blockchain/config";
+import JobPortal from '../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { ethers } from "ethers";
 // import Preferences from '@/components/Tasks'
 import Head from "next/head"
 import ProposalModal from '@/components/ProposalModal'
 import TaskSubmitModal from '@/components/TaskSubmitModal'
 
 
-const TaskInfo = () => {
+export default function TaskInfo() {
     const [modal, setModal] = useState(false)
     const [taskModal, setTaskModal] = useState(false)
     const router = useRouter()
@@ -17,6 +21,50 @@ const TaskInfo = () => {
     const [bid, setBid] = useState("");
     const [duration, setDuration] = useState("");
     const [proposalDetails, setProposalDetails] = useState("");
+    const [taskDetails, setTaskDetails] = useState([]);
+
+    useEffect(() => {
+        async function getTasks() {
+            let tasksArr = [];
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.providers.Web3Provider(connection);
+            const signer = provider.getSigner();
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            const cnt = await jobPortal.getTaskCountByProjectId(id);
+            console.log(cnt)
+            for (let i = 0; i <= cnt.toNumber(); i++) {
+                tasksArr.push(i);
+            }
+
+            const data = await Promise.all(tasksArr.map(async (p) => {
+                const project = await jobPortal.getTaskData(p);
+                // get the address of the signer
+                console.log(signer)
+                const meta = await axios.get(project[0])
+                console.log(meta)
+                // convert the array to object
+                const taskObj = {
+                    uri: project[0],
+                    id: project[1].toNumber(),
+                    manager: project[2],
+                    taskCount: project[3].toNumber(),
+                    title: meta.data.title,
+                    skills: meta.data.skills,
+                    image: meta.data.image,
+                    duration: meta.data.duration,
+                    description: meta.data.description,
+                    category: meta.data.category
+                }
+                return taskObj;
+            }))
+            setTaskDetails(data);
+            console.log(data)
+        }
+        getTasks();
+
+    }, []);
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -156,5 +204,3 @@ const TaskInfo = () => {
         </>
     )
 }
-
-export default TaskInfo

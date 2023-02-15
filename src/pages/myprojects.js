@@ -3,8 +3,8 @@ import Header from '@/components/Header'
 import MyProjectCard from '@/components/MyProjectCard'
 import { useState, useEffect } from 'react'
 import Web3Modal from "web3modal";
-import { contractAddress } from "../blockchain/config";
-import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { contractAddress } from "../../blockchain/config";
+import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import axios from 'axios';
 import { ethers } from "ethers";
 

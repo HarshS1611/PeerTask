@@ -1,8 +1,8 @@
 import React from 'react'
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
-import { contractAddress } from "../blockchain/config";
-import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { contractAddress } from "../../blockchain/config";
+import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS, client } from '../utils/ipfs'
 
 
