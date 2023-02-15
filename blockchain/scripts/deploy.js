@@ -9,6 +9,7 @@ const fs = require("fs");
 
 async function main() {
   const JobPortal = await hre.ethers.getContractFactory("JobPortal");
+<<<<<<< HEAD:blockchain/scripts/deploy.js
 
   const jobPortal = await JobPortal.deploy();
 
@@ -17,6 +18,20 @@ async function main() {
   fs.writeFileSync(
     "./config.js",
     `export const contractAddress = "${jobPortal.address}";`
+=======
+  //const test = await hre.ethers.getContractFactory("TaskBidding");
+
+  const jobPortal = await JobPortal.deploy();
+  //const testContract = await test.deploy();
+
+  await jobPortal.deployed();
+ // await testContract.deployed();
+
+  fs.writeFileSync(
+    "./config.js",
+    `export const contractAddress = "${jobPortal.address}";
+    `
+>>>>>>> e9dd5b70b71c6c83341fe1de74f7de80d9a58465:src/blockchain/scripts/deploy.js
   );
 
 }
