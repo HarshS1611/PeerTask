@@ -12,7 +12,7 @@ import TaskCard from "@/components/TaskCard";
 
 const ProjectInfo = () => {
     const router = useRouter()
-    const { id } = router.query
+    const { projectId } = router.query
     const [projectData, setProjectData] = useState([]);
     const [tasks, setTasks] = useState([]);
     useEffect(() => {
@@ -29,14 +29,14 @@ const ProjectInfo = () => {
                 signer
             );
 
-            const cnt = await jobPortal.getTaskCountByProjectId(id);
+            const cnt = await jobPortal.getTaskCountByProjectId(projectId);
             for (let i = 0; i <= cnt.toNumber(); i++) {
                 tasksArr.push(i);
             }
 
             const data = await Promise.all(
                 tasksArr.map(async (t) => {
-                    const task = await jobPortal.getTaskData(id, t);
+                    const task = await jobPortal.getTaskData(projectId, t);
                     const meta = await axios.get(task[0]);
                     console.log(meta);
                     // convert the array to object
@@ -60,8 +60,15 @@ const ProjectInfo = () => {
                 })
             );
             // setProjectsData(data);
-            console.log(data);
-            setTasks(data);
+            console.log(data)
+            // setTasks(data);
+            // filter each task to remove all undefined ad null values
+            const filteredTasks = data.filter((task) =>
+                task.taskName !== undefined || task.taskDescription !== undefined
+            );
+            console.log(filteredTasks);
+            setTasks(filteredTasks);
+
         }
         getTasks();
         // Get a project by its id
@@ -78,7 +85,7 @@ const ProjectInfo = () => {
                 JobPortal.abi,
                 signer
             );
-            const project = await jobPortal.projects(id);
+            const project = await jobPortal.projects(projectId);
             const meta = await axios.get(project[0]);
             console.log(meta);
             // convert the array to object
@@ -160,56 +167,64 @@ const ProjectInfo = () => {
                     </div>
                 </div>
                 <h1 className="text-2xl font-bold my-2 md:ml-2">Tasks</h1>
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-[#0284c7]">
-                        <tr>
-                            <th
-                                scope="col"
-                                className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
-                            >
-                                ID
-                            </th>
-                            <th
-                                scope="col"
-                                className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
-                            >
-                                Task Name
-                            </th>
-                            <th
-                                scope="col"
-                                className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
-                            >
-                                Candidates
-                            </th>
-                            <th
-                                scope="col"
-                                className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
-                            >
-                                Duration
-                            </th>
-                            <th
-                                scope="col"
-                                className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
-                            >
-                                Status
-                            </th>
-                            <th
-                                scope="col"
-                                className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
-                            >
+                {
+                    tasks.length > 0 ? (
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-[#0284c7]">
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
+                                    >
+                                        ID
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
+                                    >
+                                        Task Name
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
+                                    >
+                                        Candidates
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
+                                    >
+                                        Duration
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
+                                    >
+                                        Status
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
+                                    >
 
-                            </th>
-                        </tr>
-                    </thead>
-                    {
-                        tasks.map((task) => {
-                            return (
-                                <TaskCard task={task} />
-                            )
-                        }
-                        )
-                    }
-                </table>
+                                    </th>
+                                </tr>
+                            </thead>
+                            {
+                                tasks.map((task) => (
+                                    <TaskCard key={task.Id} task={task}
+                                        id={projectId}
+                                    />
+                                ))
+
+                            }
+                        </table>
+                    ) : (
+                        <div className='flex justify-center align-center'>
+                            <h1 className='text-2xl font-bold text-white'>No Tasks Found</h1>
+                        </div>
+                    )
+                }
 
 
 

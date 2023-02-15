@@ -2,66 +2,70 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Header from '@/components/Header'
 import Web3Modal from "web3modal";
-import { contractAddress } from "../../../blockchain/config";
-import JobPortal from '../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { contractAddress } from "../../../../../blockchain/config";
+// import JobPortal from '../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import JobPortal from "../../../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json";
 import { ethers } from "ethers";
 // import Preferences from '@/components/Tasks'
 import Head from "next/head"
 import ProposalModal from '@/components/ProposalModal'
 import TaskSubmitModal from '@/components/TaskSubmitModal'
+import axios from 'axios'
+// import { useRouter } from 'next/router';
 
 
 export default function TaskInfo() {
     const [modal, setModal] = useState(false)
     const [taskModal, setTaskModal] = useState(false)
     const router = useRouter()
-    const { id } = router.query
+    const { asPath } = useRouter()
     const [proposal, setProposal] = useState([]);
     const [motivation, setMotivation] = useState("");
     const [bid, setBid] = useState("");
     const [duration, setDuration] = useState("");
     const [proposalDetails, setProposalDetails] = useState("");
-    const [taskDetails, setTaskDetails] = useState([]);
+    const [taskDisplayDetails, setDisplayTaskDetails] = useState([]);
+    console.log(asPath);
+    let projectId = asPath.split('/')[3];
+    console.log(projectId);
+    let taskId = asPath.split('/')[4];
+    console.log(taskId);
 
     useEffect(() => {
-        async function getTasks() {
-            let tasksArr = [];
+        async function getTask() {
+            console.log("tasks");
             const web3Modal = new Web3Modal();
             const connection = await web3Modal.connect();
             const provider = new ethers.providers.Web3Provider(connection);
             const signer = provider.getSigner();
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
-            const cnt = await jobPortal.getTaskCountByProjectId(id);
-            console.log(cnt)
-            for (let i = 0; i <= cnt.toNumber(); i++) {
-                tasksArr.push(i);
-            }
+            const jobPortal = new ethers.Contract(
+                contractAddress,
+                JobPortal.abi,
+                signer
+            );
+            const task = await jobPortal.getTaskData(projectId, taskId);
+            console.log(task[0]);
+            const meta = await axios.get(task[0]);
+            // console.log(meta.data);
+            // convert the array to object
+            console.log(task);
+            const taskObj = {
+                uri: task[0],
+                Id: task[1].toNumber(),
+                stakedAmount: task[2].toNumber(),
+                proposalCount: task[3].toNumber(),
+                worker: task[4],
+                isComplete: task[5],
+                isReviewed: task[6],
+                taskName: meta.data.taskName,
+                taskDescription: meta.data.taskDescription,
+                taskDuration: meta.data.taskDuration,
 
-            const data = await Promise.all(tasksArr.map(async (p) => {
-                const project = await jobPortal.getTaskData(p);
-                // get the address of the signer
-                console.log(signer)
-                const meta = await axios.get(project[0])
-                console.log(meta)
-                // convert the array to object
-                const taskObj = {
-                    uri: project[0],
-                    id: project[1].toNumber(),
-                    manager: project[2],
-                    taskCount: project[3].toNumber(),
-                    title: meta.data.title,
-                    skills: meta.data.skills,
-                    image: meta.data.image,
-                    duration: meta.data.duration,
-                    description: meta.data.description,
-                    category: meta.data.category
-                }
-                return taskObj;
-            }))
-            setTaskDetails(data);
-            console.log(data)
+            };
+            console.log(taskObj);
+            setDisplayTaskDetails(taskObj);
         }
-        getTasks();
+        getTask();
 
     }, []);
 
@@ -91,7 +95,7 @@ export default function TaskInfo() {
                         </h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            Build responsive Navbar
+                            {taskDisplayDetails.taskName}
                         </p>
                     </div>
                     <div className='flex flex-col md:flex-row my-4'>
@@ -100,7 +104,7 @@ export default function TaskInfo() {
                         </h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet quos ullam, architecto maxime repellendus id corporis? Veritatis natus quia repellendus?
+                            {taskDisplayDetails.taskDescription}
                         </p>
                     </div>
                     <div className='flex flex-col md:flex-row my-4'>
@@ -141,7 +145,9 @@ export default function TaskInfo() {
                         </h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            0.5ETH
+                            {
+                                taskDisplayDetails.stakedAmount
+                            }
                         </p>
                     </div>
                     <div className='flex flex-col md:flex-row my-4'>
@@ -149,7 +155,9 @@ export default function TaskInfo() {
                             Duration
                         </h3>
                         <p className="text-sm md:ml-2 mt-1">
-                            2 weeks
+                            {
+                                taskDisplayDetails.taskDuration
+                            }
                         </p>
                     </div>
                     <button

@@ -1,7 +1,9 @@
+import Link from 'next/link';
 import React from 'react'
 
 const TaskCard = ({
-    task
+    task,
+    id
 }) => {
     console.log(task);
     // go to the uri of each task and fetch the details
@@ -38,8 +40,9 @@ const TaskCard = ({
                     }
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                    <button
-                        className='
+                    <Link href={`viewtask/${id}/${task.Id}`}>
+                        <button
+                            className='
                         bg-[#0284c7]
                         text-white
                         font-semibold
@@ -53,9 +56,10 @@ const TaskCard = ({
                         hover:px-4
                         hover:py-2
                         '
-                    >
-                        View
-                    </button>
+                        >
+                            View more
+                        </button>
+                    </Link>
                 </td>
             </tr>
         </tbody>
