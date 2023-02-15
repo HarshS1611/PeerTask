@@ -7,10 +7,14 @@ import { ethers } from "ethers";
 import { contractAddress } from "../../../blockchain/config";
 import JobPortal from "../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json";
 import Web3Modal from "web3modal";
+import axios from "axios";
+import TaskCard from "@/components/TaskCard";
 
 const ProjectInfo = () => {
     const router = useRouter()
     const { id } = router.query
+    const [projectData, setProjectData] = useState([]);
+    const [tasks, setTasks] = useState([]);
     useEffect(() => {
         async function getTasks() {
             console.log("tasks");
@@ -33,29 +37,67 @@ const ProjectInfo = () => {
             const data = await Promise.all(
                 tasksArr.map(async (t) => {
                     const task = await jobPortal.getTaskData(id, t);
-                    // const meta = await axios.get(project[0]);
-                    // console.log(meta);
+                    const meta = await axios.get(task[0]);
+                    console.log(meta);
                     // convert the array to object
-                    //   console.log(task);
-                    const projectObj = {
+                    console.log(task);
+                    const taskObj = {
                         uri: task[0],
-                        //   id: task[1].toNumber(),
-                        //   stakedAmount: task[2].toNumber(),
-                        //   taskCount: project[3].toNumber(),
-                        //   title: meta.data.title,
-                        //   skills: meta.data.skills,
-                        //   image: meta.data.image,
-                        //   duration: meta.data.duration,
-                        //   description: meta.data.description,
-                        //   category: meta.data.category,
+                        Id: task[1].toNumber(),
+                        stakedAmount: task[2].toNumber(),
+                        proposalCount: task[3].toNumber(),
+                        worker: task[4],
+                        isComplete: task[5],
+                        isReviewed: task[6],
+                        taskName: meta.data.taskName,
+                        taskDescription: meta.data.taskDescription,
+                        taskDuration: meta.data.taskDuration,
+
                     };
-                    return projectObj;
+                    // convert the uri to specific details such as name and description
+                    // console.log(taskObj.uri);
+                    return taskObj;
                 })
             );
             // setProjectsData(data);
             console.log(data);
+            setTasks(data);
         }
         getTasks();
+        // Get a project by its id
+        // Get all tasks for that project
+        // Display all tasks
+        async function getProject() {
+            console.log("project");
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.providers.Web3Provider(connection);
+            const signer = provider.getSigner();
+            const jobPortal = new ethers.Contract(
+                contractAddress,
+                JobPortal.abi,
+                signer
+            );
+            const project = await jobPortal.projects(id);
+            const meta = await axios.get(project[0]);
+            console.log(meta);
+            // convert the array to object
+            const projectObj = {
+                uri: project[0],
+                id: project[1].toNumber(),
+                manager: project[2],
+                taskCount: project[3].toNumber(),
+                title: meta.data.title,
+                skills: meta.data.skills,
+                image: meta.data.image,
+                duration: meta.data.duration,
+                description: meta.data.description,
+                category: meta.data.category,
+            };
+            console.log(projectObj);
+            setProjectData(projectObj);
+        }
+        getProject();
     }, []);
 
     return (
@@ -67,7 +109,7 @@ const ProjectInfo = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Header />
-            {/* <section className="bg-black text-white pb-6 px-10">
+            <section className="bg-black text-white pb-6 px-10">
                 <h1 className="text-2xl font-bold my-2 md:ml-2">Project Info</h1>
                 <div className='bg-[#1a1e27] rounded-xl p-5 mt-5'>
                     <div className='flex flex-col md:flex-row my-2'>
@@ -76,7 +118,9 @@ const ProjectInfo = () => {
                         </h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            Project name
+                            {
+                                projectData.title
+                            }
                         </p>
                     </div>
                     <div className='flex flex-col md:flex-row my-2'>
@@ -85,7 +129,9 @@ const ProjectInfo = () => {
                         </h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet quos ullam, architecto maxime repellendus id corporis? Veritatis natus quia repellendus?
+                            {
+                                projectData.description
+                            }
                         </p>
                     </div>
                     <div className='flex flex-col md:flex-row my-2'>
@@ -94,7 +140,9 @@ const ProjectInfo = () => {
                         </h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            Defi
+                            {
+                                projectData.category
+                            }
                         </p>
 
                     </div>
@@ -105,66 +153,68 @@ const ProjectInfo = () => {
                         </h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            Solidity, React, Next.js
+                            {
+                                projectData.skills
+                            }
                         </p>
                     </div>
                 </div>
-                <h1 className="text-2xl font-bold my-2 md:ml-2">Tasks</h1> */}
-            {/* Following should contain a list of tasks that the user can view and select to bid on. Task name, status , amount and no.of candidates working on that task is to be kep as table headers */}
+                <h1 className="text-2xl font-bold my-2 md:ml-2">Tasks</h1>
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-[#0284c7]">
+                        <tr>
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
+                            >
+                                ID
+                            </th>
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
+                            >
+                                Task Name
+                            </th>
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-xs font-bold text-left text-white uppercase "
+                            >
+                                Candidates
+                            </th>
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
+                            >
+                                Duration
+                            </th>
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
+                            >
+                                Status
+                            </th>
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-xs font-bold text-right text-white uppercase "
+                            >
 
-            {/* <div className="my-2 overflow-x-auto">
-                        <div className="py-2 inline-block w-full">
-                            <div className="shadow overflow-hidden border-b border-pur sm:rounded-lg"> */}
-
-            {/* <table className="table-auto w-full text-left">
-                    <thead className="bg-[#1a1e27]">
-                        <tr className="bg-[#0284c7] text-left text-sm leading-4 font-medium text-white uppercase tracking-wider">
-                            <th className="p-4">Task Name</th>
-                            <th className="p-4">Amount</th>
-                            <th className="p-4">No. of Candidates</th>
-                            <th className="p-4">Status</th>
-                            <th className="p-4"></th>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-[#1a1e27] ">
-                        <tr className="text-sm text-white m-20">
-                            <td className="p-4">Task 1</td>
-                            <td className="p-4">1000</td>
-                            <td className="p-4">2</td>
-                            <td className="p-4">
-                                <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-600 text-white-800">
-                                    Done
-                                </span>
-                            </td>
-                            <td>
-                                <Link href={`/task/${id}`}>
-                                    <button className="bg-[#1a1e27] text-white border border-white rounded-md px-4 py-2 text-sm font-medium hover:bg-white hover:text-black  m-3">View more</button>
+                    {
+                        tasks.map((task) => {
+                            return (
+                                <TaskCard task={task} />
+                            )
+                        }
+                        )
+                    }
+                </table>
 
-                                </Link>
-                            </td>
 
-                        </tr>
-                        <tr className="text-sm text-white m-20">
-                            <td className="p-4">Task 2</td>
-                            <td className="p-4">1000</td>
-                            <td className="p-4">2</td>
-                            <td className="p-4">
-                                <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-600 text-white-800">
-                                    Pending
-                                </span>
-                            </td>
-                            <Link href={`/task/${id}`}>
-                                <button className="bg-[#1a1e27] text-white border border-white rounded-md px-4 py-2 text-sm font-medium hover:bg-white hover:text-black m-3">View more</button>
-                            </Link>
-                        </tr>
-                    </tbody>
-                </table> */}
 
-            {/* </div>
-                        </div>
-                    </div> */}
 
-            {/* </section> */}
+            </section>
         </>
     );
 };
