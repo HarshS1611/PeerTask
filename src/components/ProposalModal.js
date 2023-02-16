@@ -18,12 +18,14 @@ export default function ProposalModal(setModal) {
         duration: 0,
     });
 
+    // get projectId and taskId from url
     const { asPath } = useRouter()
     let projectId = asPath.split('/')[3];
     console.log(projectId);
     let taskId = asPath.split('/')[4];
     console.log(taskId);
 
+    // submit proposal
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(proposal);
