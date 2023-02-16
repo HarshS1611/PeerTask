@@ -41,6 +41,8 @@ contract JobPortal{
 
     mapping(uint => Project) public projects; //Project[] public projects;
     uint public projectCount;
+
+    mapping (address => Person) public person;
     
     event NewProject(uint projectId, address projectManager, string projectURI);
     event NewTask(uint projectId, uint taskId, uint stakedAmount, string taskURI);
@@ -164,8 +166,39 @@ contract JobPortal{
 
         payable(worker).transfer(stakedAmount);
 
+        person[worker].rating += 1;
+
         emit PaymentReleased(projectId, taskId, worker, stakedAmount);
     
     }
+
+    // when bid is high
+    function increaseStakedAmount(uint projectId, uint taskId) public payable {
+        require(msg.sender == projects[projectId].projectManager, "Only project manager can increase staked amount");
+        require(!projects[projectId].tasks[taskId].completed, "Task is already completed");
+
+
+        projects[projectId].tasks[taskId].stakedAmount += msg.value;
+
+        (bool sent, bytes memory data) = (address(this)).call{value: msg.value}("");
+
+        require(sent, "Not sent");
+    }
+    
+    // when bid is low
+    function refundStakedAmount(uint projectId, uint taskId) public {
+        require(msg.sender == projects[projectId].projectManager, "Only project manager can refund staked amount");
+        require(!projects[projectId].tasks[taskId].completed, "Task is already completed");
+
+        uint stakedAmount = projects[projectId].tasks[taskId].stakedAmount;
+        require(stakedAmount > amount, "Staked amount is less than the amount to be refunded");
+
+        projects[projectId].tasks[taskId].stakedAmount -= msg.value;
+
+        (bool sent, bytes memory data) = (address(msg.sender)).call{value: msg.value}("");
+
+        require(sent, "Not sent");
+    }
+    
 
 }
