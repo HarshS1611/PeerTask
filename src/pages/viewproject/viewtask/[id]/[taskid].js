@@ -3,15 +3,12 @@ import { useRouter } from 'next/router'
 import Header from '@/components/Header'
 import Web3Modal from "web3modal";
 import { contractAddress } from "../../../../../blockchain/config";
-// import JobPortal from '../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import JobPortal from "../../../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json";
 import { ethers } from "ethers";
-// import Preferences from '@/components/Tasks'
 import Head from "next/head"
 import ProposalModal from '@/components/ProposalModal'
 import TaskSubmitModal from '@/components/TaskSubmitModal'
 import axios from 'axios'
-// import { useRouter } from 'next/router';
 
 
 export default function TaskInfo() {
@@ -19,11 +16,6 @@ export default function TaskInfo() {
     const [taskModal, setTaskModal] = useState(false)
     const router = useRouter()
     const { asPath } = useRouter()
-    const [proposal, setProposal] = useState([]);
-    const [motivation, setMotivation] = useState("");
-    const [bid, setBid] = useState("");
-    const [duration, setDuration] = useState("");
-    const [proposalDetails, setProposalDetails] = useState("");
     const [taskDisplayDetails, setDisplayTaskDetails] = useState([]);
     console.log(asPath);
     let projectId = asPath.split('/')[3];
@@ -70,10 +62,10 @@ export default function TaskInfo() {
     }, []);
 
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        console.log(proposal);
-    };
+    // const handleSubmit = async (event) => {
+    //     event.preventDefault();
+    //     console.log(proposal);
+    // };
     return (
         <>
             <Head>
@@ -174,21 +166,7 @@ export default function TaskInfo() {
                     '>
                         Submit Proposal
                     </button>
-                    {
-                        modal && <ProposalModal setModal={setModal}
-                            proposal={proposal}
-                            setProposal={setProposal}
-                            motivation={motivation}
-                            setMotivation={setMotivation}
-                            bid={bid}
-                            setBid={setBid}
-                            duration={duration}
-                            setDuration={setDuration}
-                            proposalDetails={proposalDetails}
-                            setProposalDetails={setProposalDetails}
-                            handleSubmit={handleSubmit}
-                        />
-                    }
+                    {modal && <ProposalModal setModal={setModal} />}
 
                     <button
                         onClick={() => setTaskModal(true)}

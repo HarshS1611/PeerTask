@@ -50,8 +50,8 @@ export default function CreateProject() {
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
             const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
             console.log(uri)
-            const tx = await jobPortal.createProject(uri);
-            await tx.wait();
+            // const tx = await jobPortal.createProject(uri);
+            // await tx.wait();
             console.log("Project created!");
         } catch (err) {
             console.log("Error: ", err);
@@ -79,7 +79,7 @@ export default function CreateProject() {
                 justify-center'
             >
                 <form className='bg-[#1a1e27] w-8/12 h-fit rounded-xl p-5 mt-3' onSubmit={handleSubmit}>
-                    <h2 className='font-bold text-white text-2xl text-center'>Register with Us!</h2>
+                    <h2 className='font-bold text-white text-2xl text-center'>Create Project!</h2>
                     <div className='flex relative m-0'>
                         <input type="text" placeholder="Title"
                             value={projectData.title}
