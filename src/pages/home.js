@@ -2,17 +2,29 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Header from '@/components/Header'
 import ProjectCard from '@/components/ProjectCard'
+import { AuthProvider,CHAIN } from "@arcana/auth";
+
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import axios from 'axios';
 
-
+const authArcana = new AuthProvider(`34f13018df2e380560b5784d0eb0079401f0d02c`, {
+    position: 'left',
+    theme: 'light',
+    alwaysVisible: true,
+    network: 'testnet', // network can be testnet or mainnet - defaults to testnet
+    chainConfig: {
+      chainId: CHAIN.POLYGON_MUMBAI_TESTNET,
+      rpcUrl: 'https://matic-mumbai.chainstacklabs.com',
+    },
+  })
 export default function Home() {
 
     // On screen load get projects count
     const [projectsData, setProjectsData] = useState([]);
+    const provider = authArcana.provider;
 
     useEffect(() => {
         async function getProjects() {
@@ -21,6 +33,16 @@ export default function Home() {
             const connection = await web3Modal.connect();
             const provider = new ethers.providers.Web3Provider(connection);
             const signer = provider.getSigner();
+            await authArcana.init()
+
+
+            const arcanaProvider = await authArcana.loginWithSocial('google')
+            // const info = await authArcana.getUser()
+
+            // console.log({ info })
+            // const provider = new ethers.providers.Web3Provider(arcanaProvider)
+            // const signer = provider.getSigner()
+            //console.log(signer);
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
             const cnt = await jobPortal.getCurrentProjectId();
             for (let i = 0; i <= cnt.toNumber(); i++) {
