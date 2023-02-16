@@ -9,7 +9,7 @@ import Router from 'next/router';
 
 
 
-export default function ProposalModal(setModal) {
+export default function ProposalModal({ setModal }) {
 
     const [proposal, setProposal] = useState({
         bid: 0,
@@ -27,7 +27,7 @@ export default function ProposalModal(setModal) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(proposal);
-
+        proposal.bid = ethers.utils.parseEther(proposal.bid.toString());
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
