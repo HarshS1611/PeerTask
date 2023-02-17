@@ -191,7 +191,6 @@ contract JobPortal{
         require(!projects[projectId].tasks[taskId].completed, "Task is already completed");
 
         uint stakedAmount = projects[projectId].tasks[taskId].stakedAmount;
-        require(stakedAmount > amount, "Staked amount is less than the amount to be refunded");
 
         projects[projectId].tasks[taskId].stakedAmount -= msg.value;
 
