@@ -1,7 +1,10 @@
 import React from 'react'
 import Image from 'next/image'
 
-function ProposalCard() {
+function ProposalCard({
+    proposal
+}) {
+    console.log(proposal);
     return (
         <div className="my-10 mx-8 roomcard border-2 border-slate-700 rounded-xl">
             <div className="rounded overflow-hidden h-full">
@@ -27,7 +30,9 @@ function ProposalCard() {
                         </h1>
 
                         <span className="text-white pt-1">
-                            Name
+                            {
+                                proposal.motivation
+                            }
                         </span>
                     </div>
                     <div className="flex">
@@ -36,7 +41,9 @@ function ProposalCard() {
                         </h1>
 
                         <span className="text-white pt-1">
-                            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Recusandae, error?
+                            {
+                                proposal.proposalDescription
+                            }
                         </span>
                     </div>
                     <div className="flex justify-items-center">
@@ -45,7 +52,10 @@ function ProposalCard() {
                         </h1>
 
                         <span className="text-white pt-1 mx-14">
-                            0.0001 ETH
+                            {
+                                proposal.bid
+                            }
+                            ETH
                         </span>
                     </div>
                 </div>
