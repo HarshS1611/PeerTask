@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\Harsh\\Desktop\\web3\\PeerTask\\blockchain\\contracts\\JobPortal.sol": {
+      "lastModificationDate": 1676549277263,
+      "contentHash": "fd73ffd30af426d08687e02e5628b873",
+      "sourceName": "contracts/JobPortal.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.17"
+      ],
+      "artifacts": [
+        "JobPortal"
+      ]
+    }
+  }
+}

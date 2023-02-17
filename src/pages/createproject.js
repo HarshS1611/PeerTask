@@ -5,13 +5,10 @@ import Web3Modal from "web3modal";
 import { Auth, useAuth } from "@arcana/auth-react";
 
 import { ethers } from "ethers";
-<<<<<<< HEAD
+
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
-=======
-import { contractAddress } from "../blockchain/config";
-import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
->>>>>>> e9dd5b70b71c6c83341fe1de74f7de80d9a58465
+
 import { uploadToIPFS, client } from '../utils/ipfs'
 
 
@@ -31,11 +28,9 @@ export default function CreateProject() {
         // updatedAt: '',
     })
 
-<<<<<<< HEAD
-=======
     const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
-    useAuth();
->>>>>>> e9dd5b70b71c6c83341fe1de74f7de80d9a58465
+        useAuth();
+
     async function onChange(e) {
         const file = e.target.files[0];
         try {
@@ -57,18 +52,10 @@ export default function CreateProject() {
             // const connection = await web3Modal.connect();
             // const provider = new ethers.providers.Web3Provider(connection);
             // const signer = provider.getSigner();
-            
 
-            const Provider = new ethers.providers.Web3Provider(provider);
-            const sig = Provider.getSigner();
-            
 
-<<<<<<< HEAD
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
-=======
-            console.log(sig)
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
->>>>>>> e9dd5b70b71c6c83341fe1de74f7de80d9a58465
+            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, provider);
             const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
             console.log(uri)
             const tx = await jobPortal.createProject(uri);
@@ -100,7 +87,7 @@ export default function CreateProject() {
                 justify-center'
             >
                 <form className='bg-[#1a1e27] w-8/12 h-fit rounded-xl p-5 mt-3' onSubmit={handleSubmit}>
-                    <h2 className='font-bold text-white text-2xl text-center'>Register with Us!</h2>
+                    <h2 className='font-bold text-white text-2xl text-center'>Create Project!</h2>
                     <div className='flex relative m-0'>
                         <input type="text" placeholder="Title"
                             value={projectData.title}

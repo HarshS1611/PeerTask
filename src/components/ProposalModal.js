@@ -1,19 +1,45 @@
-import React from 'react'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
+import Web3Modal from "web3modal";
+import { contractAddress } from "../../blockchain/config";
+import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json";
+import { ethers } from "ethers";
+import { uploadToIPFS, client } from '../utils/ipfs'
+import Router from 'next/router';
 
-const ProposalModal = ({
-    setModal,
-    proposal,
-    setProposal,
-    motivation,
-    setMotivation,
-    bid,
-    setBid,
-    duration,
-    setDuration,
-    proposalDetails,
-    setProposalDetails,
-    handleSubmit,
-}) => {
+
+
+export default function ProposalModal({ setModal }) {
+
+    const [proposal, setProposal] = useState({
+        bid: 0,
+        motivation: '',
+        proposalDetails: '',
+        duration: 0,
+    });
+
+    const { asPath } = useRouter()
+    let projectId = asPath.split('/')[3];
+    console.log(projectId);
+    let taskId = asPath.split('/')[4];
+    console.log(taskId);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        console.log(proposal);
+        proposal.bid = ethers.utils.parseEther(proposal.bid.toString());
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+        const uri = await uploadToIPFS(proposal);
+        console.log(uri);
+        const tx = await jobPortal.sendProposal(projectId, taskId, proposal.bid, proposal.motivation, uri);
+        await tx.wait();
+        Router.push(`/viewproject/viewtask/${projectId}/${taskId}`);
+    };
+
     return (
         <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none backdrop-filter backdrop-blur-sm ">
             <div className="relative w-auto my-6 mx-auto">
@@ -34,22 +60,16 @@ const ProposalModal = ({
                             <label className="block text-white text-sm font-semibold mb-1">
                                 Motivation*
                             </label>
-                            <textarea type="text" className="shadow appearance-none border rounded w-full text-white
-                                            block h-fit bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-2 mt-3 mb-2 mr-10 text-sm w-full focus:outline-none
-                            transition transform duration-100 ease-out resize-none "
+                            <textarea type="text" className="shadow appearance-none border rounded w-full text-white block h-fit bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-2 mt-3 mb-2 mr-10 text-sm w-full focus:outline-none transition transform duration-100 ease-out resize-none "
                                 required
-                                value={motivation}
-                                onChange={(e) => setMotivation(e.target.value)}
+                                onChange={(e) => setProposal({ ...proposal, motivation: e.target.value })}
                             />
 
                             <label className="block text-white text-sm font-semibold mb-1">
                                 Bid(ETH)*
                             </label>
-                            <input type="number" className="shadow appearance-none border rounded w-full text-white
-                                       block h-10 bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-5 mt-2 mb-2 mr-10 text-sm w-full focus:outline-none
-                                        transition transform duration-100 ease-out"
-                                value={bid}
-                                onChange={(e) => setBid(e.target.value)}
+                            <input type="number" className="shadow appearance-none border rounded w-full text-white block h-10 bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-5 mt-2 mb-2 mr-10 text-sm w-full focus:outline-none transition transform duration-100 ease-out"
+                                onChange={(e) => setProposal({ ...proposal, bid: e.target.value })}
                                 required
                                 min={0}
                                 max={100}
@@ -57,11 +77,8 @@ const ProposalModal = ({
                             <label className="block text-white text-sm font-semibold mb-1">
                                 Duration(days)*
                             </label>
-                            <input type="number" className="shadow appearance-none border rounded w-full text-white
-                                       block h-10 bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-5 mt-2 mb-2 mr-10 text-sm w-full focus:outline-none
-                                        transition transform duration-100 ease-out"
-                                value={duration}
-                                onChange={(e) => setDuration(e.target.value)}
+                            <input type="number" className="shadow appearance-none border rounded w-full text-white block h-10 bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-5 mt-2 mb-2 mr-10 text-sm w-full focus:outline-none transition transform duration-100 ease-out"
+                                onChange={(e) => setProposal({ ...proposal, duration: e.target.value })}
                                 required
                                 min={0}
                                 max={10}
@@ -70,22 +87,16 @@ const ProposalModal = ({
                                 Proposal*
                             </label>
                             <textarea
-                                value={proposalDetails}
-                                onChange={(e) => setProposalDetails(e.target.value)}
-
+                                onChange={(e) => setProposal({ ...proposal, proposalDetails: e.target.value })}
                                 type="text"
-                                id="description" className='
-                                            shadow appearance-none border rounded w-full text-white
-                                            block h-fit bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-2 mt-3 mb-2 mr-10 text-sm w-full focus:outline-none
-                            transition transform duration-100 ease-out resize-none 
-                            ' required />
+                                id="description" className='shadow appearance-none border rounded w-full text-white block h-fit bg-[#ffffff12] text-white rounded-lg px-2 border border-slate-600 py-2 mt-3 mb-2 mr-10 text-sm w-full focus:outline-none transition transform duration-100 ease-out resize-none' required />
                         </form>
                     </div>
 
                     <button
                         className="text-white bg-sky-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                         type="submit"
-                    // onClick={handleAddTask}
+                        onClick={handleSubmit}
                     >
                         Save
                     </button>
@@ -95,5 +106,3 @@ const ProposalModal = ({
         </div>
     )
 }
-
-export default ProposalModal

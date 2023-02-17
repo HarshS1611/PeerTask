@@ -1,15 +1,25 @@
+/* eslint-disable jsx-a11y/alt-text */
 import Link from 'next/link'
 import React from 'react'
 import Image from 'next/image'
 
 const MyProjectCard = ({ project }) => {
+<<<<<<< HEAD
     console.log(project.image)
+=======
+    // console.log(project.image)
+    console.log(project)
+>>>>>>> 617783c61ac6119cb26ab3924286b6c84ddb3372
     return (
 
         <div className="flex py-7 px-3 border-2 border-slate-700 rounded-xl m-5 hover:opacity-90 hover:shadow-lg pr-4 transition duration-500 ease-in">
             {/* Just for image div-LHS */}
             <div className="relative h-24 w-40 md:h-52 md:w-80 flex-shrink-0">
+<<<<<<< HEAD
                 <Image src={project.image} alt="img" layout="fill" objectFit="cover" />
+=======
+                <Image src={project.image} layout="fill" objectFit="cover" className="rounded-2xl" />
+>>>>>>> 617783c61ac6119cb26ab3924286b6c84ddb3372
             </div>
             {/* Content div-RHS */}
             <div className='flex flex-col flex-grow pl-5'>
@@ -30,7 +40,7 @@ const MyProjectCard = ({ project }) => {
                             hover:bg-white hover:text-black
                             ">Edit Project</button>
                         </Link>
-                        <Link href={`/viewproject/${project.id}`}>
+                        <Link href={`/projectview/${project.id}`}>
                             <button className="hidden md:inline-flex bg-transparent text-white text-lg px-5 py-2 border border-white-500 rounded-xl
                             hover:bg-white hover:text-black
                             ">View Project</button>
