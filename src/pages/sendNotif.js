@@ -2,17 +2,60 @@
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import * as PushAPI from "@pushprotocol/restapi";
-
+import { EmbedSDK } from "@pushprotocol/uiembed";
+import { useEffect } from "react";
 
 
 export default function SendNotif() {
+
+    async function getAccount() {
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        let account = await signer.getAddress();
+        return account;
+    }
+
+    useEffect(() => {
+        let account = getAccount();
+        if (account) { // 'your connected wallet address'
+            EmbedSDK.init({
+                headerText: 'PeerTask Notofications', // optional
+                targetID: 'sdk-trigger-id', // mandatory
+                appName: 'PeerTask', // mandatory
+                user: account, // mandatory
+                chainId: 1, // mandatory
+                viewOptions: {
+                    type: 'sidebar', // optional [default: 'sidebar', 'modal']
+                    showUnreadIndicator: false, // optional
+                    unreadIndicatorColor: '#cc1919',
+                    unreadIndicatorPosition: 'bottom-right',
+                },
+                theme: 'dark',
+                onOpen: () => {
+                    console.log('-> client dApp onOpen callback');
+                },
+                onClose: () => {
+                    console.log('-> client dApp onClose callback');
+                }
+            });
+        }
+
+        return () => {
+            EmbedSDK.cleanup();
+        };
+    }, []);
 
     // send notification
     const sendNotification = async () => {
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
+        const signer = new ethers.Wallet(process.env.NEXT_PUBLIC_PUSH_SECRET_KEY, provider);
+        // get signer from private key
+
+
         const apiResponse = await PushAPI.payloads.sendNotification({
             signer,
             type: 1, // broadcast
@@ -56,8 +99,8 @@ export default function SendNotif() {
             <div>
                 <h1>Get Notif</h1>
                 <button onClick={getNotifications}>Get</button>
-
             </div>
+            <button id="sdk-trigger-id">trigger button</button>
         </>
     )
 }

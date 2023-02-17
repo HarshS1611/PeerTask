@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS, client } from '../utils/ipfs'
+import sendNotif from '../utils/notifications'
 
 
 export default function CreateProject() {
@@ -53,6 +54,11 @@ export default function CreateProject() {
             // const tx = await jobPortal.createProject(uri);
             // await tx.wait();
             console.log("Project created!");
+
+            // send notification to the manager
+            await sendNotif([await signer.getAddress()], `Project ${title} is added to PeerTask!`, `Project ${title} is now available for developers `)
+            router.push('/myprojects')
+
         } catch (err) {
             console.log("Error: ", err);
         }

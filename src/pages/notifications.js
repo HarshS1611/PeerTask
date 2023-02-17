@@ -8,6 +8,7 @@ export default function Notifications() {
 
     const [notifs, setNotifs] = useState([]);
 
+
     const getNotifications = async () => {
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
@@ -35,6 +36,13 @@ export default function Notifications() {
                     <h1 className="text-2xl font-semibold my-10 md:ml-5">Notifications</h1>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {/* If notif is empty display */}
+                        {notifs.length === 0 && (
+                            <div className="bg-gray-800 rounded-lg p-4">
+                                <h1 className="text-xl font-semibold">No notifications</h1>
+                                <p className="text-sm">You haven&apos;t received any notifications yet.</p>
+                            </div>
+                        )}
                         {notifs && notifs.map((n, i) => (
                             // Add UI for notifications
                             <div className="bg-gray-800 rounded-lg p-4" key={i}>

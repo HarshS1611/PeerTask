@@ -1,13 +1,36 @@
 import React from 'react'
 import Router from 'next/router';
 import Head from 'next/head';
+import Web3Modal from "web3modal";
+import { ethers } from "ethers";
+import * as PushAPI from "@pushprotocol/restapi";
+
 export default function Login() {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
     console.log(email, password)
+
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+
+    await PushAPI.channels.subscribe({
+      signer: signer,
+      channelAddress: 'eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db', // channel address in CAIP
+      userAddress: 'eip155:5:' + await signer.getAddress(), // user address in CAIP
+      onSuccess: () => {
+        console.log('opt in success');
+      },
+      onError: () => {
+        console.error('opt in error');
+      },
+      env: 'staging'
+    })
+
     Router.push('/home')
   }
   // TODO: Integrate Arcana Login
