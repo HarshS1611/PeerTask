@@ -9,16 +9,6 @@ import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS, client } from '../utils/ipfs'
 
-const authArcana = new AuthProvider(`34f13018df2e380560b5784d0eb0079401f0d02c`, {
-    position: 'left',
-    theme: 'light',
-    alwaysVisible: true,
-    network: 'testnet', // network can be testnet or mainnet - defaults to testnet
-    chainConfig: {
-      chainId: CHAIN.POLYGON_MUMBAI_TESTNET,
-      rpcUrl: 'https://matic-mumbai.chainstacklabs.com',
-    },
-  })
 
 export default function CreateProject() {
     const [fileUrl, setFileUrl] = useState(null);
