@@ -2,11 +2,23 @@ import Header from '@/components/Header'
 import { useState } from 'react'
 import Head from 'next/head'
 import Web3Modal from "web3modal";
+import { Auth, useAuth } from "@arcana/auth-react";
+
 import { ethers } from "ethers";
-import { contractAddress } from "../../blockchain/config";
-import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { contractAddress } from "../blockchain/config";
+import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS, client } from '../utils/ipfs'
 
+const authArcana = new AuthProvider(`34f13018df2e380560b5784d0eb0079401f0d02c`, {
+    position: 'left',
+    theme: 'light',
+    alwaysVisible: true,
+    network: 'testnet', // network can be testnet or mainnet - defaults to testnet
+    chainConfig: {
+      chainId: CHAIN.POLYGON_MUMBAI_TESTNET,
+      rpcUrl: 'https://matic-mumbai.chainstacklabs.com',
+    },
+  })
 
 export default function CreateProject() {
     const [fileUrl, setFileUrl] = useState(null);
@@ -24,6 +36,8 @@ export default function CreateProject() {
         // updatedAt: '',
     })
 
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
     async function onChange(e) {
         const file = e.target.files[0];
         try {
@@ -41,17 +55,22 @@ export default function CreateProject() {
         const { title, description, category, skills, duration } = projectData
         if (!title || !description || !category || !skills || !fileUrl || !duration) return
         try {
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            
 
+            const Provider = new ethers.providers.Web3Provider(provider);
+            const sig = Provider.getSigner();
+            
 
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            console.log(sig)
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
             const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
             console.log(uri)
-            // const tx = await jobPortal.createProject(uri);
-            // await tx.wait();
+            const tx = await jobPortal.createProject(uri);
+            await tx.wait();
             console.log("Project created!");
         } catch (err) {
             console.log("Error: ", err);
