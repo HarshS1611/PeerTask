@@ -18,10 +18,7 @@ export default function Home() {
     useEffect(() => {
         async function getProjects() {
             let projectsArr = [];
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
 
             //   await authArcana.init();
             //   const arcprovider = authArcana.provider;
@@ -33,7 +30,7 @@ export default function Home() {
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
-                signer
+                provider
             );
             const cnt = await jobPortal.getCurrentProjectId();
             for (let i = 0; i <= cnt.toNumber(); i++) {

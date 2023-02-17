@@ -54,8 +54,12 @@ export default function CreateProject() {
             // const signer = provider.getSigner();
 
 
-            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, provider);
+            const Provider = new ethers.providers.Web3Provider(provider);
+            const sig = Provider.getSigner();
+
+
+
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
             const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
             console.log(uri)
             const tx = await jobPortal.createProject(uri);
