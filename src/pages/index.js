@@ -18,7 +18,7 @@ export default function Login() {
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
 
-    await PushAPI.channels.subscribe({
+    let apiResponse = await PushAPI.channels.subscribe({
       signer: signer,
       channelAddress: 'eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db', // channel address in CAIP
       userAddress: 'eip155:5:' + await signer.getAddress(), // user address in CAIP
@@ -85,7 +85,7 @@ export default function Login() {
 
           <p className="mt-8 text-xs font-light text-center text-white">
             {" "}
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a
               href="#"
               className="font-medium text-[#0284c7] hover:underline"

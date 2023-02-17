@@ -6,6 +6,7 @@ import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPor
 import { ethers } from "ethers";
 import { uploadToIPFS, client } from '../utils/ipfs'
 import Router from 'next/router';
+import sendNotif from '@/utils/notifications';
 
 
 
@@ -37,8 +38,20 @@ export default function ProposalModal(setModal) {
         const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
         const uri = await uploadToIPFS(proposal);
         console.log(uri);
-        const tx = await jobPortal.sendProposal(projectId, taskId, proposal.bid, proposal.motivation, uri);
-        await tx.wait();
+        // const tx = await jobPortal.sendProposal(projectId, taskId, proposal.bid, proposal.motivation, uri);
+        // await tx.wait();
+
+
+
+        // send notification to the user
+        sendNotif([await signer.getAddress()], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
+
+        // send notification to the manager
+        // get project details
+        const project = await jobPortal.projects(projectId);
+        console.log(project)
+        // sendNotif([project.projectManager], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
+
         Router.push(`/viewproject/viewtask/${projectId}/${taskId}`);
     };
 
