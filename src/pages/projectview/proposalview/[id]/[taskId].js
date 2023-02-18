@@ -29,7 +29,7 @@ export default function TaskInfo() {
             // const connection = await web3Modal.connect();
             // const provider = new ethers.providers.Web3Provider(connection);
             // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
+            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
@@ -64,7 +64,7 @@ export default function TaskInfo() {
             // const connection = await web3Modal.connect();
             // const provider = new ethers.providers.Web3Provider(connection);
             // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
+            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,

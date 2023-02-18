@@ -190,13 +190,13 @@ contract JobPortal{
         require(msg.sender == projects[projectId].projectManager, "Only project manager can refund staked amount");
         require(!projects[projectId].tasks[taskId].completed, "Task is already completed");
 
-        uint stakedAmount = projects[projectId].tasks[taskId].stakedAmount;
+        //uint stakedAmount = projects[projectId].tasks[taskId].stakedAmount;
 
-        projects[projectId].tasks[taskId].stakedAmount -= msg.value;
+        //projects[projectId].tasks[taskId].stakedAmount -= msg.value;
 
-        (bool sent, bytes memory data) = (address(msg.sender)).call{value: msg.value}("");
+        //(bool sent, bytes memory data) = (address(msg.sender)).call{value: msg.value}("");
 
-        require(sent, "Not sent");
+        //require(sent, "Not sent");
     }
     
 

@@ -36,6 +36,11 @@ module.exports = {
       url: "https://rpc.ankr.com/eth_goerli",
       accounts: [PRIVATE_KEY],
     },
+    hyperspace: {
+      chainId: 3141,
+      url: "https://api.hyperspace.node.glif.io/rpc/v1",
+      accounts: [PRIVATE_KEY],
+  },
   },
   etherscan: {
     apiKey: {

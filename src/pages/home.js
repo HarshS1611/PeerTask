@@ -18,7 +18,7 @@ export default function Home() {
     useEffect(() => {
         async function getProjects() {
             let projectsArr = [];
-            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
+            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
 
             //   await authArcana.init();
             //   const arcprovider = authArcana.provider;

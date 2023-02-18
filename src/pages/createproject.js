@@ -55,11 +55,11 @@ export default function CreateProject() {
 
 
             const Provider = new ethers.providers.Web3Provider(provider);
-            const sig = Provider.getSigner();
+            const signer = Provider.getSigner();
 
 
 
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
             const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
             console.log(uri)
             const tx = await jobPortal.createProject(uri);

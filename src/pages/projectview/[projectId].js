@@ -19,14 +19,16 @@ const ProjectInfoAdmin = () => {
         async function getTasks() {
             console.log("tasks");
             let tasksArr = [];
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
+
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
-                signer
+                provider
             );
 
             const cnt = await jobPortal.getTaskCountByProjectId(projectId);
@@ -76,14 +78,15 @@ const ProjectInfoAdmin = () => {
         // Display all tasks
         async function getProject() {
             console.log("project");
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
-                signer
+                provider
             );
             const project = await jobPortal.projects(projectId);
             const meta = await axios.get(project[0]);

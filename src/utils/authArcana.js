@@ -7,9 +7,6 @@ export const authArcana = new AuthProvider(
     theme: "light",
     alwaysVisible: true,
     network: "testnet", // network can be testnet or mainnet - defaults to testnet
-    chainConfig: {
-      chainId: CHAIN.POLYGON_MUMBAI_TESTNET,
-      rpcUrl: "https://matic-mumbai.chainstacklabs.com",
-    },
+    
   }
 );
