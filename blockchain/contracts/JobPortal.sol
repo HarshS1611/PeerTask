@@ -19,6 +19,8 @@ contract JobPortal{
         uint proposalCount;
         bool completed;
         bool reviewed;
+        bool isWaiting;
+        bool onGoing;
     }
 
     struct Proposal {
@@ -32,7 +34,6 @@ contract JobPortal{
 
     struct Person {
         string personURI;
-        uint id;
         string name;
         string wallet_address;
         string description;
@@ -87,10 +88,24 @@ contract JobPortal{
         uint proposalCount,
         address worker,
         bool isComplete,
-        bool isReviewed
+        bool isReviewed,
+        bool isWaiting,
+        bool onGoing
     ) {
         Task storage task = projects[projectId].tasks[taskId];
-        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed);
+
+        for (uint i = 0; i < task.proposalCount; i++) {
+            if (task.proposals[i].freelancer == msg.sender && task.proposals[i].isWaiting) {
+                task.proposals[i].isWaiting = true;
+            }
+        }
+
+        if (task.selectedWorker == msg.sender) {
+            task.isWaiting = false;
+            task.onGoing = true;
+        }
+
+        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed, task.isWaiting, task.onGoing);
     }
 
 
@@ -134,6 +149,16 @@ contract JobPortal{
             proposals[i] = projects[projectId].tasks[taskId].proposals[i];
         }
         return proposals;
+    }
+
+    function addPerson(string memory personURI, string memory name, string memory wallet_address, string memory description) public {
+        person[msg.sender].personURI = personURI;
+        person[msg.sender].name = name;
+        person[msg.sender].wallet_address = wallet_address;
+        person[msg.sender].description = description;
+        person[msg.sender].rating = 0;
+        person[msg.sender].total_projects = 0;
+        person[msg.sender].total_tasks = 0;
     }
 
     function selectWorker(uint projectId, uint taskId, address worker) public {
