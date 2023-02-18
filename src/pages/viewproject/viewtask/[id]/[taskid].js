@@ -17,12 +17,13 @@ export default function TaskInfo() {
     const router = useRouter()
     const { asPath } = useRouter()
     const [taskDisplayDetails, setDisplayTaskDetails] = useState([]);
-    console.log(asPath);
+    // console.log(asPath);
     let projectId = asPath.split('/')[3];
-    console.log(projectId);
+    // console.log(projectId);
     let taskId = asPath.split('/')[4];
-    console.log(taskId);
-
+    // console.log(taskId);
+    const [proposalView, setProposalView] = useState([]);
+    const [isAddress, setIsAddress] = useState(false)
     useEffect(() => {
         async function getTask() {
             console.log("tasks");
@@ -58,6 +59,55 @@ export default function TaskInfo() {
             setDisplayTaskDetails(taskObj);
         }
         getTask();
+        async function getProposals() {
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.providers.Web3Provider(connection);
+            const signer = provider.getSigner();
+            const jobPortal = new ethers.Contract(
+                contractAddress,
+                JobPortal.abi,
+                signer
+            );
+            const proposalDetails = await jobPortal.getProposalsByTaskId(projectId, taskId);
+            console.log("proposalDesails" + proposalDetails);
+            console.log("myaddress" + typeof signer.getAddress())
+            if (proposalDetails.length === 0) {
+                return;
+            }
+            const data = await Promise.all(
+                proposalDetails.map(async (proposals) => {
+                    console.log("proposals" + proposals[1]);
+                    if (proposals[1] == await signer.getAddress()) {
+                        console.log("inside proposal map if cond")
+                        console.log("proposals" + proposals[1])
+                        console.log(await signer.getAddress())
+                        await setIsAddress(true);
+                        // const meta = await axios.get(proposals[0]);
+                        // console.log(meta.data);
+                        // // convert the array to object
+                        const proposalObj = {
+                            uri: proposals[0],
+                            // worker: proposals[1],
+                            // bid: proposals[2].toNumber(),
+                            // motivation: meta.data.motivation,
+                            // proposalDescription: meta.data.proposalDetails,
+                            // setDisplayTaskDetails(proposalObj);
+                        }
+                        // Check if user's wallet address is same as worker address
+
+                        // if (account == proposalObj.worker) {
+                        //     setIsAddress(true);
+                        // }
+                        return proposalObj;
+                    }
+                }))
+            console.log(data);
+            // console.log(isAddress);
+            setProposalView(data);
+            // console.log(proposalView);
+        }
+        getProposals();
 
     }, []);
 
@@ -66,6 +116,7 @@ export default function TaskInfo() {
     //     event.preventDefault();
     //     console.log(proposal);
     // };
+    console.log(isAddress);
     return (
         <>
             <Head>
@@ -76,7 +127,7 @@ export default function TaskInfo() {
             </Head>
             <Header />
             <section className="bg-black text-white pb-6 px-10">
-                <h1 className="text-2xl font-bold my-2 md:ml-2">Project Name</h1>
+                <h1 className="text-2xl font-bold my-2 md:ml-2">Project Details</h1>
                 <p className="text-sm md:ml-2 mt-4">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore atque ea aut error aliquam, molestiae ipsum perspiciatis exercitationem quisquam! Ducimus cupiditate dolore voluptates assumenda accusantium!
                 </p>
@@ -144,7 +195,7 @@ export default function TaskInfo() {
                     </div>
                     <div className='flex flex-col md:flex-row my-4'>
                         <h3 className="text-lg font-semibold md:ml-2">
-                            Duration
+                            Duration:
                         </h3>
                         <p className="text-sm md:ml-2 mt-1">
                             {
@@ -152,9 +203,13 @@ export default function TaskInfo() {
                             }
                         </p>
                     </div>
-                    <button
-                        onClick={() => setModal(true)}
-                        className='
+                    {/* If the user's wallet address matches the worker address, then show the submit task button else show in progress */}
+                    {!isAddress ||
+                        proposalView.length === 0
+                        ? (
+                            <button
+                                onClick={() => setModal(true)}
+                                className='
                         bg-[#0284c7]
                         text-white
                         font-semibold
@@ -164,11 +219,19 @@ export default function TaskInfo() {
                         mt-4
                         md:ml-2
                     '>
-                        Submit Proposal
-                    </button>
+                                Submit Proposal
+                            </button>
+                        ) : (
+                            <h1 className="text-lg font-semibold md:ml-2">
+                                Status:
+                                <span className="text-sm md:ml-2 mt-1">
+                                    Waiting
+                                </span>
+                            </h1>
+                        )}
                     {modal && <ProposalModal setModal={setModal} />}
 
-                    <button
+                    {/* <button
                         onClick={() => setTaskModal(true)}
                         className='
                         bg-[#0284c7]
@@ -184,7 +247,7 @@ export default function TaskInfo() {
                     </button>
                     {
                         taskModal && <TaskSubmitModal setTaskModal={setTaskModal} />
-                    }
+                    } */}
                 </div>
             </section>
         </>
