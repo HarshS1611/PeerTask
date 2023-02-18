@@ -19,7 +19,6 @@ contract JobPortal{
         uint proposalCount;
         bool completed;
         bool reviewed;
-        bool isWaiting;
         bool onGoing;
     }
 
@@ -171,6 +170,7 @@ contract JobPortal{
             if (projects[projectId].tasks[taskId].proposals[i].freelancer == worker) {
                 projects[projectId].tasks[taskId].proposals[i].isWaiting = false;
                 projects[projectId].tasks[taskId].proposals[i].isAccepted = true;
+                projects[projectId].tasks[taskId].onGoing = true;
             } else {
                 projects[projectId].tasks[taskId].proposals[i].isAccepted = false;
             }
