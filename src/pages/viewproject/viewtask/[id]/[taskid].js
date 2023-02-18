@@ -70,35 +70,36 @@ export default function TaskInfo() {
                 signer
             );
             const proposalDetails = await jobPortal.getProposalsByTaskId(projectId, taskId);
-            console.log("proposalDesails" + proposalDetails);
+            console.log(proposalDetails);
             console.log("myaddress" + typeof signer.getAddress())
             if (proposalDetails.length === 0) {
                 return;
             }
+            console.log("proposalDetails" + proposalDetails);
             const data = await Promise.all(
                 proposalDetails.map(async (proposals) => {
-                    console.log("proposals" + proposals[1]);
-                    if (proposals[1] == await signer.getAddress()) {
+                    console.log("proposals" + proposals);
+                    if (proposals[3] == await signer.getAddress()) {
                         console.log("inside proposal map if cond")
                         console.log("proposals" + proposals[1])
                         console.log(await signer.getAddress())
                         await setIsAddress(true);
-                        // const meta = await axios.get(proposals[0]);
-                        // console.log(meta.data);
+                        const meta = await axios.get(proposals[0]);
+                        console.log(meta.data);
                         // // convert the array to object
                         const proposalObj = {
-                            uri: proposals[0],
-                            // worker: proposals[1],
-                            // bid: proposals[2].toNumber(),
-                            // motivation: meta.data.motivation,
-                            // proposalDescription: meta.data.proposalDetails,
-                            // setDisplayTaskDetails(proposalObj);
+                            uri: proposals[2],
+                            worker: proposals[3],
+                            bid: proposals[4].toNumber(),
+                            motivation: meta.data.motivation,
+                            proposalDescription: meta.data.proposalDetails
                         }
                         // Check if user's wallet address is same as worker address
 
                         // if (account == proposalObj.worker) {
                         //     setIsAddress(true);
                         // }
+                        console.log(proposalObj);
                         return proposalObj;
                     }
                 }))
