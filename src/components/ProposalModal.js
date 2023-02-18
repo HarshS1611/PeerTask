@@ -6,7 +6,7 @@ import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPor
 import { ethers } from "ethers";
 import { uploadToIPFS, client } from '../utils/ipfs'
 import Router from 'next/router';
-
+import { Auth, useAuth } from "@arcana/auth-react";
 
 
 export default function ProposalModal({ setModal }) {
@@ -17,7 +17,7 @@ export default function ProposalModal({ setModal }) {
         proposalDetails: '',
         duration: 0,
     });
-
+    const { provider } = useAuth();
     const { asPath } = useRouter()
     let projectId = asPath.split('/')[3];
     console.log(projectId);
@@ -28,11 +28,13 @@ export default function ProposalModal({ setModal }) {
         event.preventDefault();
         console.log(proposal);
         proposal.bid = ethers.utils.parseEther(proposal.bid.toString());
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
-        const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        const Provider = new ethers.providers.Web3Provider(provider);
+        const sig = Provider.getSigner();
+        const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
         const uri = await uploadToIPFS(proposal);
         console.log(uri);
         const tx = await jobPortal.sendProposal(projectId, taskId, proposal.bid, proposal.motivation, uri);

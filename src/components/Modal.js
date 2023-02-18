@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS, client } from '../utils/ipfs'
-
+import { useAuth } from "@arcana/auth-react";
 
 const Modal = ({
     setModalOpen,
@@ -13,18 +13,21 @@ const Modal = ({
     id,
     // handleAddTask
 }) => {
-
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
     const handleAddTask = async (e) => {
         e.preventDefault()
         console.log(tasksData)
         if (!tasksData.taskName || !tasksData.taskDescription || !tasksData.stakedAmount || !tasksData.taskDuration) return;
         try {
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            const Provider = new ethers.providers.Web3Provider(provider);
+            const sig = Provider.getSigner();
 
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
             const uri = await uploadToIPFS({ ...tasksData });
             console.log(uri)
             const stakedAmt = ethers.utils.parseEther(tasksData.stakedAmount);

@@ -1,16 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-<<<<<<< HEAD
-    domains: ['peertask.infura-ipfs.io'],
-=======
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**",
-      },
-    ],
->>>>>>> 617783c61ac6119cb26ab3924286b6c84ddb3372
+    domains: ['peertask.infura-ipfs.io','encrypted-tbn0.gstatic.com'],
   },
   reactStrictMode: true,
 }

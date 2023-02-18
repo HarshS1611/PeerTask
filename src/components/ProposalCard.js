@@ -53,7 +53,7 @@ function ProposalCard({
 
                         <span className="text-white pt-1 mx-14">
                             {
-                                proposal.bid
+                                proposal.bid / 1000000000000000000 
                             }
                             ETH
                         </span>

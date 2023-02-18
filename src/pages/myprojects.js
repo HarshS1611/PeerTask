@@ -7,6 +7,7 @@ import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import axios from 'axios';
 import { ethers } from "ethers";
+import { authArcana } from '@/utils/authArcana';
 
 export default function Home() {
 
@@ -16,11 +17,20 @@ export default function Home() {
     useEffect(() => {
         async function getProjects() {
             let projectsArr = [];
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+              await authArcana.init();
+             // const arcprovider = authArcana.provider;
+              //const arcanaProvider = await authArcana.loginWithSocial("google");
+              //const aprovider = new ethers.providers.Web3Provider(arcanaProvider);
+             // const asigner = aprovider.getSigner();
+              const info = await authArcana.getUser(); 
+             //   console.log(info)
+            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
+
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, provider);
             const cnt = await jobPortal.getCurrentProjectId();
             for (let i = 0; i <= cnt.toNumber(); i++) {
                 projectsArr.push(i);
@@ -29,8 +39,8 @@ export default function Home() {
             const data = await Promise.all(projectsArr.map(async (p) => {
                 const project = await jobPortal.projects(p);
                 // get the address of the signer
-                console.log(signer)
-                if (project[2] == await signer.getAddress()) {
+               // console.log(signer)
+                if (project[2] == await info.address) {
                     const meta = await axios.get(project[0])
                     console.log(meta)
                     console.log(meta.data)

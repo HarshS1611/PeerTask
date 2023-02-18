@@ -19,14 +19,15 @@ const ProjectInfo = () => {
         async function getTasks() {
             console.log("tasks");
             let tasksArr = [];
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
-                signer
+                provider
             );
 
             const cnt = await jobPortal.getTaskCountByProjectId(projectId);

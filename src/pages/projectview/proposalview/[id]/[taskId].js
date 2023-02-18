@@ -25,14 +25,15 @@ export default function TaskInfo() {
     useEffect(() => {
         async function getTask() {
             console.log("tasks");
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
-                signer
+                provider
             );
             const task = await jobPortal.getTaskData(projectId, taskId);
             console.log(task[0]);
@@ -43,7 +44,7 @@ export default function TaskInfo() {
             const taskObj = {
                 uri: task[0],
                 Id: task[1].toNumber(),
-                stakedAmount: task[2].toNumber(),
+                stakedAmount: task[2].toNumber() ,
                 proposalCount: task[3].toNumber(),
                 worker: task[4],
                 isComplete: task[5],
@@ -59,14 +60,15 @@ export default function TaskInfo() {
         getTask();
         async function getProposals() {
             console.log("proposal");
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com')
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
-                signer
+                provider
             );
             const proposalDetails = await jobPortal.getProposalsByTaskId(projectId, taskId);
             console.log(proposalDetails);
@@ -81,7 +83,7 @@ export default function TaskInfo() {
                     const proposalObj = {
                         uri: proposals[0],
                         worker: proposals[1],
-                        bid: proposals[2].toNumber(),
+                        bid: proposals[2].toNumber() ,
                         motivation: meta.data.motivation,
                         proposalDescription: meta.data.proposalDetails,
                         // setDisplayTaskDetails(proposalObj);
@@ -172,8 +174,8 @@ export default function TaskInfo() {
 
                         <p className="text-sm md:ml-2 mt-1">
                             {
-                                taskDisplayDetails.stakedAmount
-                            }
+                                taskDisplayDetails.stakedAmount / 1000000000000000000
+                            } ETH
                         </p>
                     </div>
                     <div className='flex flex-col md:flex-row my-4'>
@@ -193,6 +195,7 @@ export default function TaskInfo() {
                         proposals.map((proposal) => {
                             return (
                                 <ProposalCard
+
                                     proposal={proposal} />
                             )
                         }
