@@ -26,7 +26,7 @@ export default async function sendNotif(recipients, title, body) {
     console.log('sending notification')
     apiResponse = await PushAPI.payloads.sendNotification({
         signer,
-        type: 4, // target
+        type: 3, // subset
         // type: 1,  //broadcast
         identityType: 2, // direct payload
         notification: {
@@ -39,7 +39,7 @@ export default async function sendNotif(recipients, title, body) {
             cta: '',
             img: ''
         },
-        recipients: recipients,
+        recipients: recipients[0],
         channel: 'eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db', // your channel address
         env: 'staging'
     });

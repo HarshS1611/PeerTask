@@ -52,8 +52,8 @@ export default function CreateProject() {
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
             const uri = await uploadToIPFS({ ...projectData, image: fileUrl });
             console.log(uri)
-            const tx = await jobPortal.createProject(uri);
-            await tx.wait();
+            // const tx = await jobPortal.createProject(uri);
+            // await tx.wait();
             console.log("Project created!");
 
             // send notification to the manager

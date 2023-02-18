@@ -55,21 +55,21 @@ export default function SendNotif() {
         const signer = new ethers.Wallet(process.env.NEXT_PUBLIC_PUSH_SECRET_KEY, provider);
         // get signer from private key
 
-
         const apiResponse = await PushAPI.payloads.sendNotification({
             signer,
-            type: 1, // broadcast
+            type: 4, // broadcast
             identityType: 2, // direct payload
             notification: {
-                title: `[SDK-TEST] notification TITLE:`,
+                title: `[SDK-TEST] PeerTask TITLE:`,
                 body: `[sdk-test] notification BODY`
             },
             payload: {
-                title: `[sdk-test] payload title`,
+                title: `[sdk-test] pyld title`,
                 body: `sample msg body`,
                 cta: '',
                 img: ''
             },
+            recipients: ['eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db', 'eip155:5:0xf5fD28886d2c93Ac1Af588BA5f91f750419f2cD8'], // your channel address
             channel: 'eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db', // your channel address
             env: 'staging'
         });

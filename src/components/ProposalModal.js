@@ -44,13 +44,13 @@ export default function ProposalModal({ setModal }) {
 
 
         // send notification to the user
-        sendNotif([await signer.getAddress()], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
+        // sendNotif([await signer.getAddress()], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
 
         // send notification to the manager
         // get project details
         const project = await jobPortal.projects(projectId);
-        console.log(project)
-        // sendNotif([project.projectManager], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
+        console.log("ProjectManager: ", project.projectManager)
+        sendNotif([project.projectManager], `Proposal for task ${taskId} is submitted by user!`, `Please review the proposal for task ${taskId}.`)
 
         Router.push(`/viewproject/viewtask/${projectId}/${taskId}`);
     };

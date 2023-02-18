@@ -3,7 +3,8 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
-import { uploadToIPFS, client } from '../utils/ipfs'
+import { uploadToIPFS } from '../utils/ipfs'
+import sendNotif from '@/utils/notifications';
 
 
 const Modal = ({
@@ -31,6 +32,10 @@ const Modal = ({
             const tx = await jobPortal.createTask(id, stakedAmt, uri);
             await tx.wait();
             console.log("Task created!");
+
+            // Send notification to manager
+            sendNotif([await signer.getAddress()], `Task ${tasksData.taskName} is added to PeerTask!`, `Task ${tasksData.taskName} is now available for developers `)
+            setModalOpen(false)
         } catch (err) {
             console.log("Error: ", err);
         }
