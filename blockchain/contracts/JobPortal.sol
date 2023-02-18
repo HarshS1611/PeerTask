@@ -81,7 +81,7 @@ contract JobPortal{
         return projects[projectId].taskCount;
     }
 
-    function getTaskData(uint projectId, uint taskId, string addr) public returns (
+    function getTaskData(uint projectId, uint taskId, address addr) public returns (
         string memory taskURI,
         uint Id,
         uint stakedAmount,
