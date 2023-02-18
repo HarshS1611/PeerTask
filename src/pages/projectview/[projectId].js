@@ -33,10 +33,14 @@ const ProjectInfoAdmin = () => {
             for (let i = 0; i <= cnt.toNumber(); i++) {
                 tasksArr.push(i);
             }
-
+            const addr = await signer.getAddress();
             const data = await Promise.all(
                 tasksArr.map(async (t) => {
-                    const task = await jobPortal.getTaskData(projectId, t);
+                    const task = await jobPortal.getTaskData(
+                      projectId,
+                      t,
+                      addr
+                    );
                     const meta = await axios.get(task[0]);
                     console.log(meta);
                     // convert the array to object

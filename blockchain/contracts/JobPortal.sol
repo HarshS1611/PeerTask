@@ -81,7 +81,7 @@ contract JobPortal{
         return projects[projectId].taskCount;
     }
 
-    function getTaskData(uint projectId, uint taskId, address addr) public returns (
+    function getTaskData(uint projectId, uint taskId, address addr) public view returns (
         string memory taskURI,
         uint Id,
         uint stakedAmount,
@@ -94,19 +94,20 @@ contract JobPortal{
     ) {
         Task storage task = projects[projectId].tasks[taskId];
 
-        for (uint i = 0; i < task.proposalCount; i++) {
-            if (task.proposals[i].freelancer == addr && task.proposals[i].isWaiting) {
-                task.proposals[i].isWaiting = true;
-            }
-        }
+        // for (uint i = 0; i < task.proposalCount; i++) {
+        //     if (task.proposals[i].freelancer == addr && task.proposals[i].isWaiting) {
+        //         task.proposals[i].isWaiting = true;
+        //     }
+        // }
 
-        if (task.selectedWorker == addr) {
-            task.isWaiting = false;
-            task.onGoing = true;
-        }
+        // if (task.selectedWorker == addr) {
+        //     task.isWaiting = false;
+        //     task.onGoing = true;
+        // }
 
         return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed, task.isWaiting, task.onGoing);
     }
+
 
 
     function createTask(uint projectId, uint stakedAmount, string calldata taskURI) public payable {
