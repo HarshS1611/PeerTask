@@ -22,7 +22,7 @@ export default function TaskInfo() {
     let taskId = asPath.split("/")[4];
     // console.log(taskId);
     const [proposalView, setProposalView] = useState([]);
-    const [isAddress, setIsAddress] = useState(false);
+    const [isAddress, setIsAddress] = useState("");
     const [isWaiting, setIsWaiting] = useState(false);
     const [onGoing, setOnGoing] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
@@ -40,6 +40,7 @@ export default function TaskInfo() {
         );
         await getTask(jobPortal);
         await getProposals(jobPortal);
+        setIsAddress(await signer.getAddress());
     }
 
     async function getTask(jobPortal) {
@@ -76,7 +77,7 @@ export default function TaskInfo() {
             taskId
         );
         console.log(proposalDetails);
-        console.log("myaddress" + typeof signer.getAddress());
+        // console.log("myaddress" + typeof signer.getAddress());
         if (proposalDetails.length === 0) {
             return;
         }
@@ -84,8 +85,8 @@ export default function TaskInfo() {
 
         for (let i = 0; i < proposalDetails.length; i++) {
             console.log(proposalDetails[i][3]);
-            console.log(await signer.getAddress());
-            if (proposalDetails[i][3] == (await signer.getAddress())) {
+            // console.log(await signer.getAddress());
+            if (proposalDetails[i][3] === isAddress) {
                 setIsWaiting(proposalDetails[i][0]);
                 setOnGoing(proposalDetails[i][1]);
                 setIsAddress(true);
@@ -121,7 +122,9 @@ export default function TaskInfo() {
         // // console.log(proposalView);
     }
     useEffect(() => {
+        console.log("useeffect");
         callMetaMask();
+        console.log("after useeffect");
     }, []);
 
     // const handleSubmit = async (event) => {

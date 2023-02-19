@@ -61,8 +61,8 @@ export default function CreateProject() {
 
             // send notification to the manager
             await sendNotif([await signer.getAddress()], `Project ${title} is added to PeerTask!`, `Project ${title} is now available for developers `)
-            Router.push('/myprojects')
             toast.success("Project created!");
+            Router.push('/myprojects')
             // console.log("Project created!");
             // set all the values to empty string and redirect to my projects page
             setProjectData({
