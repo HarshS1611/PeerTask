@@ -5,23 +5,26 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json"
 import { contractAddress } from '../../blockchain/config';
+import { useAuth } from "@arcana/auth-react";
 
 const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
     const [githubLink, setGithubLink] = useState('')
     const [comments, setComments] = useState('')
     const [deployedLink, setDeployedLink] = useState('')
-
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
     const handleSubmitTask = async (e) => {
         e.preventDefault()
         console.log(githubLink, comments, deployedLink)
         try {
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
 
-
-            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            const Provider = new ethers.providers.Web3Provider(provider);
+            const sig = Provider.getSigner();
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
             const uri = await uploadToIPFS({ githubLink, comments, deployedLink });
             console.log(uri)
             const tx = await jobPortal.completeTaskWorker(projectId, taskId);

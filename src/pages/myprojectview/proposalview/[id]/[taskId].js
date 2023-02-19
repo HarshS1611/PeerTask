@@ -11,6 +11,7 @@ import TaskSubmitModal from '@/components/TaskSubmitModal'
 import axios from 'axios'
 import Image from 'next/image';
 import ProposalCard from '@/components/ProposalCard';
+import { rpcURLnetwork,authArcana } from "@/utils/authArcana";
 
 
 export default function TaskInfo() {
@@ -29,7 +30,7 @@ export default function TaskInfo() {
             // const connection = await web3Modal.connect();
             // const provider = new ethers.providers.Web3Provider(connection);
             // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
+            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
@@ -63,7 +64,7 @@ export default function TaskInfo() {
             // const connection = await web3Modal.connect();
             // const provider = new ethers.providers.Web3Provider(connection);
             // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
+            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,

@@ -7,6 +7,13 @@ export const authArcana = new AuthProvider(
     theme: "light",
     alwaysVisible: true,
     network: "testnet", // network can be testnet or mainnet - defaults to testnet
-    
-  }
+    chainConfig: {
+      chainId: CHAIN.ETHEREUM_GOERLI,
+      rpcUrl: 'https://rpc.ankr.com/eth_goerli',
+    },
+      
+    },
+  
 );
+
+export const rpcURLnetwork = "https://rpc.ankr.com/eth_goerli"; // testnet

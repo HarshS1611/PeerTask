@@ -9,6 +9,7 @@ import JobPortal from "../../../blockchain/artifacts/contracts/JobPortal.sol/Job
 import Web3Modal from "web3modal";
 import axios from "axios";
 import AdminTaskCard from "@/components/AdminTaskCard";
+import { rpcURLnetwork, authArcana } from "@/utils/authArcana";
 
 const ProjectInfoAdmin = () => {
   const router = useRouter();
@@ -19,14 +20,15 @@ const ProjectInfoAdmin = () => {
     async function getTasks() {
       console.log("tasks");
       let tasksArr = [];
-      const web3Modal = new Web3Modal();
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
+      // const web3Modal = new Web3Modal();
+      // const connection = await web3Modal.connect();
+      // const provider = new ethers.providers.Web3Provider(connection);
+      // const signer = provider.getSigner();
+      const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
       const jobPortal = new ethers.Contract(
         contractAddress,
         JobPortal.abi,
-        signer
+        provider
       );
 
       const cnt = await jobPortal.getTaskCountByProjectId(projectId);
@@ -89,14 +91,15 @@ const ProjectInfoAdmin = () => {
     // Display all tasks
     async function getProject() {
       console.log("project");
-      const web3Modal = new Web3Modal();
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
+      // const web3Modal = new Web3Modal();
+      // const connection = await web3Modal.connect();
+      // const provider = new ethers.providers.Web3Provider(connection);
+      // const signer = provider.getSigner();
+      const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
       const jobPortal = new ethers.Contract(
         contractAddress,
         JobPortal.abi,
-        signer
+        provider
       );
       const project = await jobPortal.projects(projectId);
       const meta = await axios.get(project[0]);

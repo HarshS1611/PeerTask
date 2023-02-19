@@ -4,16 +4,21 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import { useAuth } from "@arcana/auth-react";
 
 
 export default function ProposalCard({ proposal }) {
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
     async function acceptProposal() {
         console.log("inside function")
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
-        const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        const Provider = new ethers.providers.Web3Provider(provider);
+        const sig = Provider.getSigner();
+        const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
         const tx = await jobPortal.selectWorker(proposal.projectId, proposal.taskId, proposal.worker);
         await tx.wait();
         console.log("Proposal Accepted");

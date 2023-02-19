@@ -9,6 +9,8 @@ import Head from "next/head";
 import ProposalModal from "@/components/ProposalModal";
 import TaskSubmitModal from "@/components/TaskSubmitModal";
 import axios from "axios";
+import { rpcURLnetwork , authArcana } from "@/utils/authArcana";
+
 
 export default function TaskInfo() {
     const [modal, setModal] = useState(false);
@@ -35,7 +37,7 @@ export default function TaskInfo() {
             // const connection = await web3Modal.connect();
             // const provider = new ethers.providers.Web3Provider(connection);
             // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
+            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
@@ -67,21 +69,24 @@ export default function TaskInfo() {
         }
         getTask();
         async function getProposals() {
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
+            // const web3Modal = new Web3Modal();
+            // const connection = await web3Modal.connect();
+            // const provider = new ethers.providers.Web3Provider(connection);
+            // const signer = provider.getSigner();
+            await authArcana.init();
+            const info = await authArcana.getUser();
+            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
             const jobPortal = new ethers.Contract(
                 contractAddress,
                 JobPortal.abi,
-                signer
+                provider
             );
             const proposalDetails = await jobPortal.getProposalsByTaskId(
                 projectId,
                 taskId
             );
             console.log(proposalDetails);
-            console.log("myaddress" + typeof signer.getAddress());
+            console.log("myaddress" + typeof info.address);
             if (proposalDetails.length === 0) {
                 return;
             }
@@ -89,8 +94,8 @@ export default function TaskInfo() {
 
             for (let i = 0; i < proposalDetails.length; i++) {
                 console.log(proposalDetails[i][3]);
-                console.log(await signer.getAddress());
-                if (proposalDetails[i][3] == (await signer.getAddress())) {
+                console.log(await info.address);
+                if (proposalDetails[i][3] == (await info.address)) {
                     await setIsWaiting(proposalDetails[i][0]);
                     await setOnGoing(proposalDetails[i][1]);
                     await setIsAddress(true);
@@ -204,7 +209,7 @@ export default function TaskInfo() {
                         <h3 className="text-lg font-semibold md:ml-2">Reward:</h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            {taskDisplayDetails.stakedAmount}
+                            {taskDisplayDetails.stakedAmount / 10 ** 18} ETH
                         </p>
                     </div>
                     <div className="flex flex-col md:flex-row my-4">

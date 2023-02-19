@@ -9,7 +9,7 @@ import JobPortal from "../../../blockchain/artifacts/contracts/JobPortal.sol/Job
 import Web3Modal from "web3modal";
 import axios from "axios";
 import TaskCard from "@/components/TaskCard";
-
+import { rpcURLnetwork,authArcana } from "../../utils/authArcana";
 
 
 const ProjectInfo = () => {
@@ -17,14 +17,14 @@ const ProjectInfo = () => {
     const { projectId } = router.query;
     const [projectData, setProjectData] = useState([]);
     const [tasks, setTasks] = useState([]);
-
-    async function checkAvailable(filteredTasks, jobPortal, signer) {
+    
+    async function checkAvailable(filteredTasks, jobPortal,  info) {
         for(let i = 0; i < filteredTasks.length; i++) {
             let task = filteredTasks[i];
             const proposals = await jobPortal.getProposalsByTaskId(projectId, task.Id);
             console.log(proposals);
             proposals.forEach(async (proposal) => {
-                if (proposal[3] === await signer.getAddress()) {
+                if (proposal[3] === await info.address) {
                     task.isAvailable = false;
                 }
             });
@@ -33,20 +33,21 @@ const ProjectInfo = () => {
     }
 
     async function getJobportalandSigner() {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
         const jobPortal = new ethers.Contract(
             contractAddress,
             JobPortal.abi,
-            signer
+            provider
         );
-        getTasks(jobPortal, signer);
-        getProject(jobPortal, signer);
+        getTasks(jobPortal, provider);
+        getProject(jobPortal, provider);
     }
 
-    async function getTasks(jobPortal, signer) {
+    async function getTasks(jobPortal, provider) {
         console.log("tasks");
         let tasksArr = [];
 
@@ -90,7 +91,9 @@ const ProjectInfo = () => {
             (task) =>
                 task.taskName !== undefined || task.taskDescription !== undefined
         );
-        filteredTasks = await checkAvailable(filteredTasks, jobPortal, signer);
+        await authArcana.init();
+        const info = await authArcana.getUser();
+        filteredTasks = await checkAvailable(filteredTasks, jobPortal,info);
         console.log(filteredTasks)
         setTasks(filteredTasks);
     }
@@ -98,7 +101,7 @@ const ProjectInfo = () => {
     // Get a project by its id
     // Get all tasks for that project
     // Display all tasks
-    async function getProject(jobPortal, signer) {
+    async function getProject(jobPortal, provider) {
         console.log("project");
         const project = await jobPortal.projects(projectId);
         const meta = await axios.get(project[0]);

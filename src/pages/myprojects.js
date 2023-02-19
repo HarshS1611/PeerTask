@@ -7,6 +7,7 @@ import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import axios from 'axios';
+import { rpcURLnetwork, authArcana } from "@/utils/authArcana";
 
 export default function Home() {
 
@@ -27,7 +28,7 @@ export default function Home() {
              // const asigner = aprovider.getSigner();
               const info = await authArcana.getUser(); 
              //   console.log(info)
-            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
+            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
 
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, provider);
             const cnt = await jobPortal.getCurrentProjectId();

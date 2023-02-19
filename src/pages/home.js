@@ -3,7 +3,7 @@ import Head from "next/head";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
 import { AuthProvider, CHAIN } from "@arcana/auth";
-
+import { rpcURLnetwork } from "../utils/authArcana";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
@@ -18,7 +18,7 @@ export default function Home() {
     useEffect(() => {
         async function getProjects() {
             let projectsArr = [];
-            const provider = new ethers.providers.JsonRpcProvider('https://api.hyperspace.node.glif.io/rpc/v1')
+            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
 
             //   await authArcana.init();
             //   const arcprovider = authArcana.provider;
