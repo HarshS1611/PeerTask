@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS } from '../utils/ipfs'
-import sendNotif from '@/utils/notifications';
+import sendNotif from '../../utils/notifications';
 
 
 const Modal = ({

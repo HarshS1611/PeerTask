@@ -9,6 +9,7 @@ import Head from "next/head";
 import ProposalModal from "@/components/ProposalModal";
 import TaskSubmitModal from "@/components/TaskSubmitModal";
 import axios from "axios";
+import MyChat from "@/components/chat";
 
 export default function TaskInfo() {
     const [modal, setModal] = useState(false);
@@ -16,17 +17,10 @@ export default function TaskInfo() {
     const router = useRouter();
     const { asPath } = useRouter();
     const [taskDisplayDetails, setDisplayTaskDetails] = useState([]);
-    // console.log(asPath);
     let projectId = asPath.split("/")[3];
-    // console.log(projectId);
     let taskId = asPath.split("/")[4];
-    // console.log(taskId);
     const [proposalView, setProposalView] = useState([]);
-    const [isAddress, setIsAddress] = useState(false);
-    const [isWaiting, setIsWaiting] = useState(false);
-    const [onGoing, setOnGoing] = useState(false);
-    const [isCompleted, setIsCompleted] = useState(false);
-    const [isReviewed, setIsReviewed] = useState(false);
+    const [address, setAddress] = useState(false);
 
     async function callMetaMask() {
         const web3Modal = new Web3Modal();
@@ -39,20 +33,16 @@ export default function TaskInfo() {
             signer
         );
         await getTask(jobPortal);
-        await getProposals(jobPortal);
+        await getProposals(jobPortal, signer);
     }
 
     async function getTask(jobPortal) {
         console.log("tasks");
 
+        // Get task details
         const task = await jobPortal.getTaskData(projectId, taskId);
         console.log("task" + JSON.stringify(task));
-        setIsCompleted(task[5]);
-        setIsReviewed(task[6]);
-
         const meta = await axios.get(task[0]);
-        // console.log(meta.data);
-        // convert the array to object
         const taskObj = {
             uri: task[0],
             Id: task[1].toNumber(),
@@ -66,17 +56,19 @@ export default function TaskInfo() {
             taskDescription: meta.data.taskDescription,
             taskDuration: meta.data.taskDuration,
         };
-        // console.log(taskObj);
+
+        // Get Project Manager
+        const project = await jobPortal.projects(projectId);
+        taskObj.projectManager = project.projectManager
         setDisplayTaskDetails(taskObj);
     }
 
-    async function getProposals(jobPortal) {
+    async function getProposals(jobPortal, signer) {
         const proposalDetails = await jobPortal.getProposalsByTaskId(
             projectId,
             taskId
         );
         console.log(proposalDetails);
-        console.log("myaddress" + typeof signer.getAddress());
         if (proposalDetails.length === 0) {
             return;
         }
@@ -86,39 +78,15 @@ export default function TaskInfo() {
             console.log(proposalDetails[i][3]);
             console.log(await signer.getAddress());
             if (proposalDetails[i][3] == (await signer.getAddress())) {
-                setIsWaiting(proposalDetails[i][0]);
-                setOnGoing(proposalDetails[i][1]);
-                setIsAddress(true);
+                // setIsWaiting(proposalDetails[i][0]);
+                setDisplayTaskDetails(...taskDisplayDetails, isWaiting = true)
+                // setOnGoing(proposalDetails[i][1]);
+                setDisplayTaskDetails(...taskDisplayDetails, onGoing = true)
+                setAddress(await signer.getAddress());
                 setProposalView(proposalDetails[i][3]);
             }
         }
-
-        // const data = await Promise.all(
-        //   proposalDetails.map(async (proposals) => {
-        //     console.log("proposals" + proposals);
-        //     if (proposals[3] == (await signer.getAddress())) {
-        //       await setIsWaiting(proposals[0]);
-        //       await setOnGoing(proposals[1]);
-
-        //       await setIsAddress(true);
-        //       const meta = await axios.get(proposals[2]);
-        //       // console.log(meta.data);
-        //       // // convert the array to object
-        //       const proposalObj = {
-        //         uri: proposals[2],
-        //         worker: proposals[3],
-        //         bid: proposals[4].toNumber(),
-        //         motivation: meta.data.motivation,
-        //         proposalDescription: meta.data.proposalDetails,
-        //       };
-        //       return proposalObj;
-        //     }
-        //   })
-        // );
-        // console.log("proposal data" + data);
-        // // console.log(isAddress);
-        // setProposalView(data);
-        // // console.log(proposalView);
+        console.log(taskDisplayDetails)
     }
     useEffect(() => {
         callMetaMask();
@@ -229,7 +197,7 @@ export default function TaskInfo() {
                         </button>
                     )}
 
-                    {isWaiting && (
+                    {taskDisplayDetails.isWaiting && (
                         <h1 className="mt-10">
                             <span
                                 className="
@@ -247,7 +215,7 @@ export default function TaskInfo() {
                             </span>
                         </h1>
                     )}
-                    {onGoing && (
+                    {taskDisplayDetails.onGoing && (
                         <button
                             onClick={() => setTaskModal(true)} // a different modal for submitting task
                             className="
@@ -264,7 +232,7 @@ export default function TaskInfo() {
                             Submit Task
                         </button>
                     )}
-                    {isCompleted && (
+                    {taskDisplayDetails.isComplete && (
                         <h1 className="mt-10">
                             <span
                                 className="
@@ -282,7 +250,7 @@ export default function TaskInfo() {
                             </span>
                         </h1>
                     )}
-                    {isReviewed && (
+                    {taskDisplayDetails.isReviewed && (
                         <h1 className="mt-10">
                             <span
                                 className="
@@ -301,27 +269,10 @@ export default function TaskInfo() {
                         </h1>
                     )}
                     {modal && <ProposalModal setModal={setModal} />}
-                    {taskModal && <TaskSubmitModal setTaskModal={setTaskModal}
-                        projectId={projectId}
-                        taskId={taskId}
-                    />}
-                    {/* <button
-                        onClick={() => setTaskModal(true)}
-                        className='
-                        bg-[#0284c7]
-                        text-white
-                        font-semibold
-                        rounded-xl
-                        px-4
-                        py-2
-                        mt-4
-                        md:ml-2
-                    '>
-                        Submit task
-                    </button>
-                    {
-                        taskModal && <TaskSubmitModal setTaskModal={setTaskModal} />
-                    } */}
+                    {taskModal && <TaskSubmitModal setTaskModal={setTaskModal} projectId={projectId} taskId={taskId} />}
+                    {(taskDisplayDetails.isComplete || taskDisplayDetails.onGoing) ? (
+                        <MyChat account={address} supportAddress={taskDisplayDetails.projectManager} />
+                    ) : (<></>)}
                 </div>
             </section>
         </>

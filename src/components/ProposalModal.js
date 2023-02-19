@@ -5,8 +5,8 @@ import { contractAddress } from "../../blockchain/config";
 import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json";
 import { ethers } from "ethers";
 import { uploadToIPFS, client } from '../utils/ipfs'
+import sendNotif from '../utils/notifications';
 import Router from 'next/router';
-import sendNotif from '@/utils/notifications';
 
 
 
