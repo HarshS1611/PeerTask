@@ -19,7 +19,7 @@ const ProjectInfo = () => {
     const [tasks, setTasks] = useState([]);
 
     async function checkAvailable(filteredTasks, jobPortal, signer) {
-        for(let i = 0; i < filteredTasks.length; i++) {
+        for (let i = 0; i < filteredTasks.length; i++) {
             let task = filteredTasks[i];
             const proposals = await jobPortal.getProposalsByTaskId(projectId, task.Id);
             console.log(proposals);
@@ -32,7 +32,7 @@ const ProjectInfo = () => {
         return filteredTasks;
     }
 
-    async function getJobportalandSigner() {
+    async function callMetaMask() {
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
@@ -42,8 +42,8 @@ const ProjectInfo = () => {
             JobPortal.abi,
             signer
         );
-        getTasks(jobPortal, signer);
-        getProject(jobPortal, signer);
+        await getTasks(jobPortal, signer);
+        await getProject(jobPortal, signer);
     }
 
     async function getTasks(jobPortal, signer) {
@@ -57,8 +57,8 @@ const ProjectInfo = () => {
 
 
         const data = await Promise.all(
-            tasksArr.map(async (t) => {
-                const task = await jobPortal.getTaskData(projectId, t);
+            tasksArr.map(async (task) => {
+                task = await jobPortal.getTaskData(projectId, task);
                 const meta = await axios.get(task[0]);
                 console.log(meta);
                 // convert the array to object
@@ -121,7 +121,7 @@ const ProjectInfo = () => {
     }
 
     useEffect(() => {
-        getJobportalandSigner();
+        callMetaMask();
 
     }, []);
 

@@ -36,7 +36,7 @@ const Modal = ({
             console.log("Task created!");
 
             // Send notification to manager
-            sendNotif([await signer.getAddress()], `Task ${tasksData.taskName} is added to PeerTask!`, `Task ${tasksData.taskName} is now available for developers `)
+            await sendNotif([await signer.getAddress()], `Task ${tasksData.taskName} is added to PeerTask!`, `Task ${tasksData.taskName} is now available for developers `)
             setModalOpen(false)
         } catch (err) {
             console.log("Error: ", err);

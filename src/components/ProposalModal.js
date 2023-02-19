@@ -38,19 +38,17 @@ export default function ProposalModal({ setModal }) {
         const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
         const uri = await uploadToIPFS(proposal);
         console.log(uri);
-        // const tx = await jobPortal.sendProposal(projectId, taskId, proposal.bid, proposal.motivation, uri);
-        // await tx.wait();
-
-
+        const tx = await jobPortal.sendProposal(projectId, taskId, proposal.bid, proposal.motivation, uri);
+        await tx.wait();
 
         // send notification to the user
-        // sendNotif([await signer.getAddress()], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
+        await sendNotif([await signer.getAddress()], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
 
         // send notification to the manager
         // get project details
         const project = await jobPortal.projects(projectId);
         console.log("ProjectManager: ", project.projectManager)
-        sendNotif([project.projectManager], `Proposal for task ${taskId} is submitted by user!`, `Please review the proposal for task ${taskId}.`)
+        await sendNotif([project.projectManager], `Proposal for task ${taskId} is submitted by user!`, `Please review the proposal for task ${taskId}.`)
 
         Router.push(`/viewproject/viewtask/${projectId}/${taskId}`);
     };

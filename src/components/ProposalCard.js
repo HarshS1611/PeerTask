@@ -4,6 +4,7 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
+import sendNotif from '@/utils/notifications';
 
 
 export default function ProposalCard({ proposal }) {
@@ -17,6 +18,10 @@ export default function ProposalCard({ proposal }) {
         const tx = await jobPortal.selectWorker(proposal.projectId, proposal.taskId, proposal.worker);
         await tx.wait();
         console.log("Proposal Accepted");
+
+        // Send notification to worker
+        await sendNotif([proposal.worker], "Proposal Accepted", "Your proposal has been accepted by the project owner. You can now start working on the task.");
+        console.log("Notification sent to worker")
     }
     console.log(proposal);
     return (
