@@ -304,7 +304,10 @@ export default function TaskInfo() {
                         </h1>
                     )}
                     {modal && <ProposalModal setModal={setModal} />}
-                    {taskModal && <TaskSubmitModal setTaskModal={setTaskModal} />}
+                    {taskModal && <TaskSubmitModal setTaskModal={setTaskModal}
+                        projectId={projectId}
+                        taskId={taskId}
+                    />}
                     {/* <button
                         onClick={() => setTaskModal(true)}
                         className='

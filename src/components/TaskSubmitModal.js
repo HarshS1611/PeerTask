@@ -1,9 +1,12 @@
 import { uploadToIPFS } from '@/utils/ipfs'
 import Router from 'next/router'
 import React, { useState } from 'react'
+import Web3Modal from "web3modal";
+import { ethers } from "ethers";
+import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json"
+import { contractAddress } from '../../blockchain/config';
 
-
-const TaskSubmitModal = ({ setTaskModal }) => {
+const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
     const [githubLink, setGithubLink] = useState('')
     const [comments, setComments] = useState('')
     const [deployedLink, setDeployedLink] = useState('')
@@ -11,10 +14,23 @@ const TaskSubmitModal = ({ setTaskModal }) => {
     const handleSubmitTask = async (e) => {
         e.preventDefault()
         console.log(githubLink, comments, deployedLink)
-        const uri = await uploadToIPFS({ githubLink, comments, deployedLink });
-        console.log(uri)
-        console.log("Task submitted!");
-        Router.push('/home')
+        try {
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.providers.Web3Provider(connection);
+            const signer = provider.getSigner();
+
+
+            const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+            const uri = await uploadToIPFS({ githubLink, comments, deployedLink });
+            console.log(uri)
+            const tx = await jobPortal.completeTaskWorker(projectId, taskId);
+            await tx.wait();
+            console.log("Project created!");
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+        // Router.push('/home')
     }
 
     return (
