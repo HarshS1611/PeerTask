@@ -8,6 +8,7 @@ import { uploadToIPFS, client } from '../utils/ipfs'
 import sendNotif from '../utils/notifications';
 import Router from 'next/router';
 import { Auth, useAuth } from "@arcana/auth-react";
+import { rpcURLnetwork , authArcana } from "../utils/authArcana";
 
 
 
@@ -40,6 +41,8 @@ export default function ProposalModal({ setModal }) {
         // const signer = provider.getSigner();
         const Provider = new ethers.providers.Web3Provider(provider);
         const sig = Provider.getSigner();
+        await authArcana.init();
+        const info = await authArcana.getUser();
         const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
         const uri = await uploadToIPFS(proposal);
         console.log(uri);
@@ -47,7 +50,7 @@ export default function ProposalModal({ setModal }) {
         await tx.wait();
 
         // send notification to the user
-        await sendNotif([await signer.getAddress()], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
+        await sendNotif([await info.address], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
 
         // send notification to the manager
         // get project details

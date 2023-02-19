@@ -9,8 +9,8 @@ import Head from "next/head";
 import ProposalModal from "@/components/ProposalModal";
 import TaskSubmitModal from "@/components/TaskSubmitModal";
 import axios from "axios";
-import { rpcURLnetwork , authArcana } from "@/utils/authArcana";
-import { useAuth } from '@arcana/auth-react'
+import { rpcURLnetwork, authArcana } from "@/utils/authArcana";
+import { useAuth } from "@arcana/auth-react";
 
 import MyChat from "@/components/chat";
 
@@ -31,7 +31,7 @@ export default function TaskInfo() {
     // const provider = new ethers.providers.Web3Provider(connection);
     // const signer = provider.getSigner();
     await authArcana.init();
-            const info = await authArcana.getUser();
+    const info = await authArcana.getUser();
     const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
     const jobPortal = new ethers.Contract(
       contractAddress,
@@ -87,11 +87,12 @@ export default function TaskInfo() {
         // setIsWaiting(proposalDetails[i][0]);
         // setDisplayTaskDetails(...taskDisplayDetails, isWaiting = true);
         // setOnGoing(proposalDetails[i][1]);
-          
-          // set isWaiting to true
+
+        // set isWaiting to true
         taskObj.isWaiting = proposalDetails[i][0];
         taskObj.onGoing = proposalDetails[i][1];
-          setDisplayTaskDetails(taskObj);
+        console.log(taskObj);
+        setDisplayTaskDetails(taskObj);
         setAddress(await info.address);
         setProposalView(proposalDetails[i][3]);
       }
@@ -194,8 +195,7 @@ export default function TaskInfo() {
           {proposalView.length == 0 &&
             !taskDisplayDetails.onGoing &&
             !taskDisplayDetails.isComplete &&
-            !taskDisplayDetails.isReviewed &&
-            (
+            !taskDisplayDetails.isReviewed && (
               <button
                 onClick={() => setModal(true)}
                 className="

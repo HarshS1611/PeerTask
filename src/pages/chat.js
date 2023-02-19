@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Chat, ITheme } from '@pushprotocol/uiweb';
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
-
+import { useAuth } from "@arcana/auth-react";
+import { rpcURLnetwork , authArcana } from "../utils/authArcana";
 export default function MyChat() {
 
     // Request method to authorize user
-
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
     const [account, setAccount] = useState("");
     const [supportAddress, setSupportAddress] = useState("");
 
@@ -16,11 +18,16 @@ export default function MyChat() {
     }
 
     async function getAccount() {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
-        let account = await signer.getAddress();
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        // let account = await signer.getAddress();
+        const Provider = new ethers.providers.Web3Provider(provider);
+    const signer = Provider.getSigner();
+    await authArcana.init();
+    const info = await authArcana.getUser();
+
         setAccount(account);
     }
 

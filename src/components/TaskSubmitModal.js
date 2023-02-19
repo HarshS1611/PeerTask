@@ -7,6 +7,7 @@ import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPor
 import { contractAddress } from '../../blockchain/config';
 import sendNotif from '../utils/notifications'
 import { useAuth } from "@arcana/auth-react";
+import { rpcURLnetwork , authArcana } from "../utils/authArcana";
 
 const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
     const [githubLink, setGithubLink] = useState('')
