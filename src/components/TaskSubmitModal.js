@@ -1,9 +1,22 @@
+import { uploadToIPFS } from '@/utils/ipfs'
+import Router from 'next/router'
 import React, { useState } from 'react'
+
 
 const TaskSubmitModal = ({ setTaskModal }) => {
     const [githubLink, setGithubLink] = useState('')
     const [comments, setComments] = useState('')
     const [deployedLink, setDeployedLink] = useState('')
+
+    const handleSubmitTask = async (e) => {
+        e.preventDefault()
+        console.log(githubLink, comments, deployedLink)
+        const uri = await uploadToIPFS({ githubLink, comments, deployedLink });
+        console.log(uri)
+        console.log("Task submitted!");
+        Router.push('/home')
+    }
+
     return (
         <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none backdrop-filter backdrop-blur-sm ">
             <div className="relative w-auto my-6 mx-auto">
@@ -39,7 +52,7 @@ const TaskSubmitModal = ({ setTaskModal }) => {
                             </label>
                             <textarea
                                 value={comments}
-                                onChange={(e) => setGithubLink(e.target.value)}
+                                onChange={(e) => setComments(e.target.value)}
 
                                 type="text"
                                 id="description" className='
@@ -66,7 +79,7 @@ const TaskSubmitModal = ({ setTaskModal }) => {
                     <button
                         className="text-white bg-sky-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                         type="submit"
-                    // onClick={handleAddTask}
+                        onClick={handleSubmitTask}
                     >
                         Save
                     </button>
