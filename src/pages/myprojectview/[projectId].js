@@ -65,8 +65,20 @@ const ProjectInfoAdmin = () => {
         (task) =>
           task.taskName !== undefined || task.taskDescription !== undefined
       );
-      console.log(filteredTasks);
-      setTasks(filteredTasks);
+
+      // Set status of each task
+      const taskStatus = filteredTasks.map((task) => {
+        if (task.isReviewed === true) {
+          task.status = "Completed";
+        } else if (task.isComplete === true) {
+          task.status = "To Review";
+        } else if (task.isComplete === false && task.isReviewed === false) {
+          task.status = "Proposal Pending";
+        }
+        return task;
+      });
+      console.log(taskStatus);
+      setTasks(taskStatus);
     }
     getTasks();
     // Get a project by its id

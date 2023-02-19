@@ -3,7 +3,8 @@ import React from 'react'
 
 const TaskCard = ({
     task,
-    id
+    id,
+    available
 }) => {
     console.log(task);
     // go to the uri of each task and fetch the details
@@ -34,11 +35,43 @@ const TaskCard = ({
                         task.taskDuration
                     }
                 </td>
-                <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                    {
-                        task.taskStatus
-                    }
-                </td>
+                {
+                    available ? (
+                        <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
+                            <span
+                                className='
+                                text-sm
+                                md:ml-3
+                                bg-green-700
+                                rounded-xl
+                                px-2
+                                py-1
+                                text-white
+                                font-semibold
+                            '
+                            >
+                                Available
+                            </span>
+                        </td>
+                    ) : (
+                        <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
+                            <span
+                                className='
+                                text-sm
+                                md:ml-3
+                                bg-yellow-700
+                                rounded-xl
+                                px-2
+                                py-1
+                                text-white
+                                font-semibold
+                            '
+                            >
+                                Not Available
+                            </span>
+                        </td>
+                    )
+                }
                 <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                     <Link href={`viewtask/${id}/${task.Id}`}>
                         <button

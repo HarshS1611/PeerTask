@@ -48,10 +48,10 @@ export default function TaskInfo() {
                 worker: task[4],
                 isComplete: task[5],
                 isReviewed: task[6],
+                onGoing: true,
                 taskName: meta.data.taskName,
                 taskDescription: meta.data.taskDescription,
                 taskDuration: meta.data.taskDuration,
-
             };
             console.log(taskObj);
             setDisplayTaskDetails(taskObj);
@@ -75,15 +75,17 @@ export default function TaskInfo() {
             }
             const data = await Promise.all(
                 proposalDetails.map(async (proposals) => {
-                    const meta = await axios.get(proposals[0]);
+                    const meta = await axios.get(proposals[2]);
                     console.log(meta.data);
                     // convert the array to object
                     const proposalObj = {
-                        uri: proposals[0],
-                        worker: proposals[1],
-                        bid: proposals[2].toNumber(),
+                        uri: proposals[2],
+                        worker: proposals[3],
+                        bid: proposals[4].toNumber(),
                         motivation: meta.data.motivation,
                         proposalDescription: meta.data.proposalDetails,
+                        projectId: projectId,
+                        taskId: taskId,
                         // setDisplayTaskDetails(proposalObj);
                     }
                     return proposalObj;
@@ -187,18 +189,30 @@ export default function TaskInfo() {
                         </p>
                     </div>
                 </div>
-                <h1 className="text-2xl font-bold my-2 md:ml-2">Proposals</h1>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {
-                        proposals.map((proposal) => {
-                            return (
-                                <ProposalCard
-                                    proposal={proposal} />
-                            )
-                        }
-                        )}
-                </div>
+
+                {!taskDisplayDetails.onGoing && (
+                    <>
+                        <h1 className="text-2xl font-bold my-2 md:ml-2">Proposals</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                            {proposals.map((proposal) => {
+                                return (
+                                    <ProposalCard key={proposal.uri}
+                                        proposal={proposal} />
+                                )
+                            })
+                            }
+
+                        </div>
+                    </>
+                )
+                }
+                {taskDisplayDetails.onGoing && <p className="text-sm md:ml-2 mt-1">
+                    Show Developer details and proposal details
+                </p>
+                }
             </section>
+
         </>
     )
 }
