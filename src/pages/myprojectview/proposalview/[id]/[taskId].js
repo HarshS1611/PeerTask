@@ -13,37 +13,49 @@ import Image from "next/image";
 import ProposalCard from "@/components/ProposalCard";
 import sendNotif from "@/utils/notifications";
 import MyChat from "@/components/chat";
+import { useAuth } from "@arcana/auth-react";
+import { rpcURLnetwork , authArcana } from "@/utils/authArcana";
 
 export default function TaskInfo() {
   const { asPath } = useRouter();
   const [taskDisplayDetails, setDisplayTaskDetails] = useState([]);
+  const [address, setAddress] = useState("");
+
   // console.log(asPath);
   let projectId = asPath.split("/")[3];
   // console.log(projectId);
   let taskId = asPath.split("/")[4];
   // console.log(taskId);
   const [proposals, setProposal] = useState([]);
-
+  const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+  useAuth();
   async function callMetaMask() {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    // const web3Modal = new Web3Modal();
+    // const connection = await web3Modal.connect();
+    // const provider = new ethers.providers.Web3Provider(connection);
+    // const signer = provider.getSigner();
+    const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
+    await authArcana.init();
+    const info = await authArcana.getUser();
     const jobPortal = new ethers.Contract(
       contractAddress,
       JobPortal.abi,
-      signer
+      provider
     );
-    await getTask(jobPortal);
+    await getTask(jobPortal, info);
     await getProposals(jobPortal);
   }
 
   async function reviewSubmission() {
     console.log("inside function");
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    // const web3Modal = new Web3Modal();
+    // const connection = await web3Modal.connect();
+    // const provider = new ethers.providers.Web3Provider(connection);
+    // const signer = provider.getSigner();
+    const Provider = new ethers.providers.Web3Provider(provider);
+    const signer = Provider.getSigner();
+    await authArcana.init();
+    const info = await authArcana.getUser();
     const jobPortal = new ethers.Contract(
       contractAddress,
       JobPortal.abi,
@@ -62,7 +74,7 @@ export default function TaskInfo() {
     console.log("Notification sent to worker");
   }
 
-  async function getTask(jobPortal) {
+  async function getTask(jobPortal,info) {
     console.log("tasks");
     const task = await jobPortal.getTaskData(projectId, taskId);
     console.log(task);
@@ -86,6 +98,8 @@ export default function TaskInfo() {
     };
     console.log(taskObj);
     setDisplayTaskDetails(taskObj);
+    setAddress(await info.address);
+
   }
 
   async function getProposals(jobPortal) {
@@ -199,7 +213,7 @@ export default function TaskInfo() {
             <h3 className="text-lg font-semibold md:ml-2">Reward:</h3>
 
             <p className="text-sm md:ml-2 mt-1">
-              {taskDisplayDetails.stakedAmount}
+              {taskDisplayDetails.stakedAmount / 1000000000000000000} ETH
             </p>
           </div>
           <div className="flex flex-col md:flex-row my-4">

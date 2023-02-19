@@ -26,19 +26,22 @@ export default function TaskInfo() {
   const [address, setAddress] = useState("");
 
   async function callMetaMask() {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    // const web3Modal = new Web3Modal();
+    // const connection = await web3Modal.connect();
+    // const provider = new ethers.providers.Web3Provider(connection);
+    // const signer = provider.getSigner();
+    await authArcana.init();
+            const info = await authArcana.getUser();
+    const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
     const jobPortal = new ethers.Contract(
       contractAddress,
       JobPortal.abi,
-      signer
+      provider
     );
-    await getTask(jobPortal, signer);
+    await getTask(jobPortal, info);
   }
 
-  async function getTask(jobPortal, signer) {
+  async function getTask(jobPortal, info) {
     console.log("tasks");
 
     // Get task details
@@ -79,8 +82,8 @@ export default function TaskInfo() {
 
     for (let i = 0; i < proposalDetails.length; i++) {
       console.log(proposalDetails[i][3]);
-      console.log(await signer.getAddress());
-      if (proposalDetails[i][3] == (await signer.getAddress())) {
+      console.log(await info.address);
+      if (proposalDetails[i][3] == (await info.address)) {
         // setIsWaiting(proposalDetails[i][0]);
         // setDisplayTaskDetails(...taskDisplayDetails, isWaiting = true);
         // setOnGoing(proposalDetails[i][1]);
@@ -89,7 +92,7 @@ export default function TaskInfo() {
         taskObj.isWaiting = proposalDetails[i][0];
         taskObj.onGoing = proposalDetails[i][1];
           setDisplayTaskDetails(taskObj);
-        setAddress(await signer.getAddress());
+        setAddress(await info.address);
         setProposalView(proposalDetails[i][3]);
       }
     }

@@ -1,14 +1,15 @@
-import React from 'react'
-import Router from 'next/router';
-import Head from 'next/head';
+import React from "react";
+import Router from "next/router";
+import Head from "next/head";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import * as PushAPI from "@pushprotocol/restapi";
 import { useAuth } from "@arcana/auth-react";
+import { rpcURLnetwork , authArcana } from "../utils/authArcana";
 
 export default function Login() {
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const auth = useAuth();
   const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
     useAuth();
@@ -19,8 +20,24 @@ export default function Login() {
       console.log(e);
     }
   };
-  const onConnect = () => {
+  const onConnect = async () => {
     console.log("connected");
+    const Provider = new ethers.providers.Web3Provider(provider);
+    const signer = Provider.getSigner();
+    await authArcana.init();
+    const info = await authArcana.getUser();
+    let apiResponse = await PushAPI.channels.subscribe({
+      signer: signer,
+      channelAddress: "eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db", // channel address in CAIP
+      userAddress: "eip155:5:" + (await info.address), // user address in CAIP
+      onSuccess: () => {
+        console.log("opt in success");
+      },
+      onError: () => {
+        console.error("opt in error");
+      },
+      env: "staging",
+    });
     Router.push("/home");
   };
   React.useEffect(() => {
@@ -31,29 +48,35 @@ export default function Login() {
   }, [provider]);
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    console.log(email, password)
+    e.preventDefault();
+    console.log(email, password);
 
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    // const web3Modal = new Web3Modal();
+    // const connection = await web3Modal.connect();
+    // const provider = new ethers.providers.Web3Provider(connection);
+    // const signer = provider.getSigner();
+    
 
+    const Provider = new ethers.providers.Web3Provider(provider);
+    const signer = Provider.getSigner();
+    await authArcana.init();
+    const info = await authArcana.getUser();
     let apiResponse = await PushAPI.channels.subscribe({
       signer: signer,
-      channelAddress: 'eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db', // channel address in CAIP
-      userAddress: 'eip155:5:' + await signer.getAddress(), // user address in CAIP
+      channelAddress: "eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db", // channel address in CAIP
+      userAddress: "eip155:5:" + (await info.address), // user address in CAIP
       onSuccess: () => {
-        console.log('opt in success');
+        console.log("opt in success");
       },
       onError: () => {
-        console.error('opt in error');
+        console.error("opt in error");
       },
-      env: 'staging'
-    })
+      env: "staging",
+    });
+    console.log(apiResponse);
 
-    Router.push('/home')
-  }
+    Router.push("/home");
+  };
   // TODO: Integrate Arcana Login
   return (
     <>
@@ -71,7 +94,8 @@ export default function Login() {
           <div className="flex justify-center items-center mt-5">
             <button
               onClick={onConnectClick}
-              className='bg-sky-500 text-white rounded-md shadow-md p-2 mt-5 w-1/2 flex items-center justify-center'>
+              className="bg-sky-500 text-white rounded-md shadow-md p-2 mt-5 w-1/2 flex items-center justify-center"
+            >
               Connect
             </button>
           </div>
@@ -79,10 +103,7 @@ export default function Login() {
           <p className="mt-8 text-xs font-light text-center text-white">
             {" "}
             Don&apos;t have an account?{" "}
-            <a
-              href="#"
-              className="font-medium text-[#0284c7] hover:underline"
-            >
+            <a href="#" className="font-medium text-[#0284c7] hover:underline">
               Sign up
             </a>
           </p>

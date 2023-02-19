@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import sendNotif from '@/utils/notifications';
+import { useAuth } from "@arcana/auth-react";
 
 
 export default function ProposalCard({ proposal }) {

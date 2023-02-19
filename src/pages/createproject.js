@@ -16,7 +16,7 @@ import Router from 'next/router';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { rpcURLnetwork , authArcana } from "../utils/authArcana";
-
+import { useAuth } from "@arcana/auth-react";
 
 export default function CreateProject() {
     const [fileUrl, setFileUrl] = useState(null);

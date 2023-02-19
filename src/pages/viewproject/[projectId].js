@@ -10,7 +10,7 @@ import Web3Modal from "web3modal";
 import axios from "axios";
 import TaskCard from "@/components/TaskCard";
 import { rpcURLnetwork,authArcana } from "../../utils/authArcana";
-
+import { useAuth } from "@arcana/auth-react";
 
 const ProjectInfo = () => {
     const router = useRouter();
