@@ -35,11 +35,10 @@ export default function TaskInfo() {
                 signer
             );
             const task = await jobPortal.getTaskData(projectId, taskId);
-            console.log(task[0]);
+            console.log(task);
             const meta = await axios.get(task[0]);
             // console.log(meta.data);
             // convert the array to object
-            console.log(task);
             const taskObj = {
                 uri: task[0],
                 Id: task[1].toNumber(),
@@ -48,7 +47,7 @@ export default function TaskInfo() {
                 worker: task[4],
                 isComplete: task[5],
                 isReviewed: task[6],
-                onGoing: true,
+                onGoing: task[7],
                 taskName: meta.data.taskName,
                 taskDescription: meta.data.taskDescription,
                 taskDuration: meta.data.taskDuration,

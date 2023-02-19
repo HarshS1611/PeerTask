@@ -36,10 +36,10 @@ const ProjectInfoAdmin = () => {
       const data = await Promise.all(
         tasksArr.map(async (t) => {
           const task = await jobPortal.getTaskData(projectId, t);
+          console.log(task);
           const meta = await axios.get(task[0]);
           console.log(meta);
           // convert the array to object
-          console.log(task);
           const taskObj = {
             uri: task[0],
             Id: task[1].toNumber(),
@@ -48,6 +48,7 @@ const ProjectInfoAdmin = () => {
             worker: task[4],
             isComplete: task[5],
             isReviewed: task[6],
+            onGoing: task[7],
             taskName: meta.data.taskName,
             taskDescription: meta.data.taskDescription,
             taskDuration: meta.data.taskDuration,
@@ -72,8 +73,10 @@ const ProjectInfoAdmin = () => {
           task.status = "Completed";
         } else if (task.isComplete === true) {
           task.status = "To Review";
-        } else if (task.isComplete === false && task.isReviewed === false) {
-          task.status = "Proposal Pending";
+        } else if (task.onGoing === true) {
+          task.status = "Ongoing";
+        } else {
+          task.status = "To Start";
         }
         return task;
       });

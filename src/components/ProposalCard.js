@@ -5,19 +5,19 @@ import { ethers } from "ethers";
 import { contractAddress } from "../blockchain/config";
 import JobPortal from '../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 
-async function acceptProposal() {
-    console.log("inside function")
-    // const web3Modal = new Web3Modal();
-    // const connection = await web3Modal.connect();
-    // const provider = new ethers.providers.Web3Provider(connection);
-    // const signer = provider.getSigner();
-    // const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
-    // const tx = await jobPortal.selectWorker(proposal.projectId, proposal.taskId, await signer.getAddress());
-    // await tx.wait();
-    console.log("Proposal Accepted");
-}
 
 export default function ProposalCard({ proposal }) {
+    async function acceptProposal() {
+        console.log("inside function")
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
+        const tx = await jobPortal.selectWorker(proposal.projectId, proposal.taskId, proposal.worker);
+        await tx.wait();
+        console.log("Proposal Accepted");
+    }
     console.log(proposal);
     return (
         <div className="my-10 mx-8 roomcard border-2 border-slate-700 rounded-xl">
