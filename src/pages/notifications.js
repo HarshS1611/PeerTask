@@ -25,7 +25,7 @@ export default function Notifications() {
 
     useEffect(() => {
         getNotifications();
-        console.log(typeof notifs)
+        console.log(notifs)
     }, []);
 
     return (
@@ -47,7 +47,9 @@ export default function Notifications() {
                             // Add UI for notifications
                             <div className="bg-gray-800 rounded-lg p-4" key={i}>
                                 <h1 className="text-xl font-semibold">{n.title}</h1>
-                                <p className="text-sm">{n.description}</p>
+                                <p className="text-sm">{n.message}</p>
+                                {/* Show Timestamp in Left corner bottom */}
+                                <p className="text-xs">{n.cta}</p>
                             </div>
                         ))}
                     </div>

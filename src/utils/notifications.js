@@ -22,7 +22,7 @@ export default async function sendNotif(recipients, title, body) {
 
     console.log(recipients)
 
-
+    let date = new Date();
     console.log('sending notification')
     apiResponse = await PushAPI.payloads.sendNotification({
         signer,
@@ -36,7 +36,8 @@ export default async function sendNotif(recipients, title, body) {
         payload: {
             title: title,
             body: body,
-            cta: '',
+            // show timestamp in notification
+            cta: date.toGMTString(),
             img: ''
         },
         recipients: recipients[0],
