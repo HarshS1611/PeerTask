@@ -28,7 +28,7 @@ export default function ProjectCard({ project }) {
                             Array(project.taskCount)
                                 .fill()
                                 .map((_, i) => (
-                                    <FaStar className="h-5 text-white" />
+                                    <FaStar key="1" className="h-5 text-white" />
                                 ))
                         }
                     </div>
