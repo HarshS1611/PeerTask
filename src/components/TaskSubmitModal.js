@@ -25,7 +25,7 @@ const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, signer);
             const uri = await uploadToIPFS({ githubLink, comments, deployedLink });
             console.log(uri)
-            const tx = await jobPortal.completeTaskWorker(projectId, taskId);
+            const tx = await jobPortal.completeTaskWorker(projectId, taskId, uri);
             await tx.wait();
             console.log("Task completed!");
 

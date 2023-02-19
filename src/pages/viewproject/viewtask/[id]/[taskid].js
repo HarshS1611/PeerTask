@@ -61,6 +61,7 @@ export default function TaskInfo() {
         const project = await jobPortal.projects(projectId);
         taskObj.projectManager = project.projectManager
         setDisplayTaskDetails(taskObj);
+        console.log(taskDisplayDetails)
     }
 
     async function getProposals(jobPortal, signer) {
@@ -89,7 +90,9 @@ export default function TaskInfo() {
         console.log(taskDisplayDetails)
     }
     useEffect(() => {
+        console.log("useeffect");
         callMetaMask();
+        console.log("after useeffect");
     }, []);
 
     // const handleSubmit = async (event) => {
@@ -179,7 +182,7 @@ export default function TaskInfo() {
                     </div>
                     {/* If the user's wallet address matches the worker address, then show the submit task button else show in progress */}
                     {/* {JSON.stringify(proposalView)} */}
-                    {proposalView.length == 0 && (
+                    {proposalView.length == 0 && !taskDisplayDetails.onGoing && !taskDisplayDetails.isComplete && !taskDisplayDetails.isReviewed && (
                         <button
                             onClick={() => setModal(true)}
                             className="
