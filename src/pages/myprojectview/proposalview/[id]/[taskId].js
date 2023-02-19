@@ -189,7 +189,7 @@ export default function TaskInfo() {
                     </div>
                 </div>
 
-                {!taskDisplayDetails.onGoing && (
+                {!taskDisplayDetails.onGoing && !taskDisplayDetails.isComplete && !taskDisplayDetails.isReviewed && (
                     <>
                         <h1 className="text-2xl font-bold my-2 md:ml-2">Proposals</h1>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -208,6 +208,14 @@ export default function TaskInfo() {
                 }
                 {taskDisplayDetails.onGoing && <p className="text-sm md:ml-2 mt-1">
                     Show Developer details and proposal details
+                </p>
+                }
+                {taskDisplayDetails.isComplete && <p className="text-sm md:ml-2 mt-1">
+                    Show for isComplete
+                </p>
+                }
+                {taskDisplayDetails.isReviewed && <p className="text-sm md:ml-2 mt-1">
+                    Show for isReviewed
                 </p>
                 }
             </section>
