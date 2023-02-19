@@ -25,14 +25,15 @@ export default function TaskInfo() {
     const [proposals, setProposal] = useState([]);
 
     async function callMetaMask() {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
         const jobPortal = new ethers.Contract(
             contractAddress,
             JobPortal.abi,
-            signer
+            provider
         );
         await getTask(jobPortal);
         await getProposals(jobPortal);

@@ -4,16 +4,20 @@ import { ethers } from "ethers";
 import * as PushAPI from "@pushprotocol/restapi";
 import { EmbedSDK } from "@pushprotocol/uiembed";
 import { useEffect } from "react";
-
+import { rpcURLnetwork , authArcana } from "@/utils/authArcana";
+import { useAuth } from "@arcana/auth-react";
 
 export default function SendNotif() {
-
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
     async function getAccount() {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
-        let account = await signer.getAddress();
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        await authArcana.init();
+        const info = await authArcana.getUser();
+        let account = await info.address;
         return account;
     }
 
@@ -49,10 +53,12 @@ export default function SendNotif() {
 
     // send notification
     const sendNotification = async () => {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = new ethers.Wallet(process.env.NEXT_PUBLIC_PUSH_SECRET_KEY, provider);
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        const Provider = new ethers.providers.Web3Provider(provider);
+       
+        const signer = new ethers.Wallet(process.env.NEXT_PUBLIC_PUSH_SECRET_KEY, Provider);
         // get signer from private key
 
         const apiResponse = await PushAPI.payloads.sendNotification({

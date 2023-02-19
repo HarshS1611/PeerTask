@@ -18,7 +18,7 @@ const ProjectInfo = () => {
     const [projectData, setProjectData] = useState([]);
     const [tasks, setTasks] = useState([]);
 
-    async function checkAvailable(filteredTasks, jobPortal, signer) {
+    async function checkAvailable(filteredTasks, jobPortal, info) {
         for (let i = 0; i < filteredTasks.length; i++) {
             let task = filteredTasks[i];
             const proposals = await jobPortal.getProposalsByTaskId(projectId, task.Id);
@@ -32,32 +32,19 @@ const ProjectInfo = () => {
         return filteredTasks;
     }
 
-<<<<<<< HEAD
-    async function getJobportalandSigner() {
+    async function callMetaMask() {
         // const web3Modal = new Web3Modal();
         // const connection = await web3Modal.connect();
         // const provider = new ethers.providers.Web3Provider(connection);
         // const signer = provider.getSigner();
         const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
-=======
-    async function callMetaMask() {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
->>>>>>> push
         const jobPortal = new ethers.Contract(
             contractAddress,
             JobPortal.abi,
             provider
         );
-<<<<<<< HEAD
-        getTasks(jobPortal, provider);
-        getProject(jobPortal, provider);
-=======
-        await getTasks(jobPortal, signer);
-        await getProject(jobPortal, signer);
->>>>>>> push
+        await getTasks(jobPortal, provider);
+        await getProject(jobPortal, provider);
     }
 
     async function getTasks(jobPortal, provider) {

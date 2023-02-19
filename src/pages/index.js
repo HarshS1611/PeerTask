@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import * as PushAPI from "@pushprotocol/restapi";
+import { useAuth } from "@arcana/auth-react";
 
 export default function Login() {
   const [email, setEmail] = React.useState('')
@@ -29,8 +30,6 @@ export default function Login() {
     };
   }, [provider]);
 
-<<<<<<< HEAD
-=======
   const handleLogin = async (e) => {
     e.preventDefault()
     console.log(email, password)
@@ -55,7 +54,6 @@ export default function Login() {
 
     Router.push('/home')
   }
->>>>>>> push
   // TODO: Integrate Arcana Login
   return (
     <>

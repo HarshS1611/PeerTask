@@ -18,14 +18,15 @@ export default function ProjectInfoAdmin() {
   const [tasks, setTasks] = useState([]);
 
   async function callMetaMask() {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    // const web3Modal = new Web3Modal();
+    // const connection = await web3Modal.connect();
+    // const provider = new ethers.providers.Web3Provider(connection);
+    // const signer = provider.getSigner();
+    const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
     const jobPortal = new ethers.Contract(
       contractAddress,
       JobPortal.abi,
-      signer
+      provider
     );
 
     await getTasks(jobPortal);
@@ -91,60 +92,6 @@ export default function ProjectInfoAdmin() {
     setTasks(taskStatus);
   }
 
-<<<<<<< HEAD
-      // Set status of each task
-      const taskStatus = filteredTasks.map((task) => {
-        if (task.isReviewed === true) {
-          task.status = "Completed";
-        } else if (task.isComplete === true) {
-          task.status = "To Review";
-        } else if (task.onGoing === true) {
-          task.status = "Ongoing";
-        } else {
-          task.status = "To Start";
-        }
-        return task;
-      });
-      console.log(taskStatus);
-      setTasks(taskStatus);
-    }
-    getTasks();
-    // Get a project by its id
-    // Get all tasks for that project
-    // Display all tasks
-    async function getProject() {
-      console.log("project");
-      // const web3Modal = new Web3Modal();
-      // const connection = await web3Modal.connect();
-      // const provider = new ethers.providers.Web3Provider(connection);
-      // const signer = provider.getSigner();
-      const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
-      const jobPortal = new ethers.Contract(
-        contractAddress,
-        JobPortal.abi,
-        provider
-      );
-      const project = await jobPortal.projects(projectId);
-      const meta = await axios.get(project[0]);
-      console.log(meta);
-      // convert the array to object
-      const projectObj = {
-        uri: project[0],
-        id: project[1].toNumber(),
-        manager: project[2],
-        taskCount: project[3].toNumber(),
-        title: meta.data.title,
-        skills: meta.data.skills,
-        image: meta.data.image,
-        duration: meta.data.duration,
-        description: meta.data.description,
-        category: meta.data.category,
-      };
-      console.log(projectObj);
-      setProjectData(projectObj);
-    }
-    getProject();
-=======
   async function getProject(jobPortal) {
     console.log("project");
     const project = await jobPortal.projects(projectId);
@@ -169,7 +116,6 @@ export default function ProjectInfoAdmin() {
 
   useEffect(() => {
     callMetaMask();
->>>>>>> push
   }, []);
 
   return (

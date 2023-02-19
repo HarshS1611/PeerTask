@@ -6,15 +6,14 @@ import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPor
 import { ethers } from "ethers";
 import { uploadToIPFS, client } from '../utils/ipfs'
 import Router from 'next/router';
-<<<<<<< HEAD
-import { Auth, useAuth } from "@arcana/auth-react";
-=======
 import sendNotif from '@/utils/notifications';
+import { Auth, useAuth } from "@arcana/auth-react";
 
->>>>>>> push
 
 
 export default function ProposalModal({ setModal }) {
+    const { user, connect, isLoggedIn, loading, loginWithSocial, provider } =
+    useAuth();
 
     const [proposal, setProposal] = useState({
         bid: 0,

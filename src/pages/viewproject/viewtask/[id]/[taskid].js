@@ -10,6 +10,7 @@ import ProposalModal from "@/components/ProposalModal";
 import TaskSubmitModal from "@/components/TaskSubmitModal";
 import axios from "axios";
 import { rpcURLnetwork , authArcana } from "@/utils/authArcana";
+import { useAuth } from '@arcana/auth-react'
 
 
 export default function TaskInfo() {
@@ -31,18 +32,21 @@ export default function TaskInfo() {
     const [isReviewed, setIsReviewed] = useState(false);
 
     async function callMetaMask() {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        await authArcana.init();
+         const info = await authArcana.getUser();
+        const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
         const jobPortal = new ethers.Contract(
             contractAddress,
             JobPortal.abi,
-            signer
+            provider
         );
         await getTask(jobPortal);
         await getProposals(jobPortal);
-        setIsAddress(await signer.getAddress());
+        setIsAddress(await info.address);
     }
 
     async function getTask(jobPortal) {
@@ -84,11 +88,12 @@ export default function TaskInfo() {
             return;
         }
         console.log("proposalDetails" + proposalDetails);
-
+        await authArcana.init();
+        const info = await authArcana.getUser();
         for (let i = 0; i < proposalDetails.length; i++) {
             console.log(proposalDetails[i][3]);
             // console.log(await signer.getAddress());
-            if (proposalDetails[i][3] === await signer.getAddress()) {
+            if (proposalDetails[i][3] === await info) {
                 setIsWaiting(proposalDetails[i][0]);
                 setOnGoing(proposalDetails[i][1]);
                 setIsAddress(true);

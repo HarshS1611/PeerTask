@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import * as PushAPI from "@pushprotocol/restapi";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
+import { rpcURLnetwork , authArcana } from "../utils/authArcana";
 
 export default function Notifications() {
 
@@ -10,13 +11,15 @@ export default function Notifications() {
 
 
     const getNotifications = async () => {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
+        // const web3Modal = new Web3Modal();
+        // const connection = await web3Modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
+        await authArcana.init();
+        const info = await authArcana.getUser();
 
         const notifications = await PushAPI.user.getFeeds({
-            user: 'eip155:5:' + await signer.getAddress(), // user address in CAIP
+            user: 'eip155:5:' + await info.address, // user address in CAIP
             env: 'staging'
         });
         console.log(notifications);

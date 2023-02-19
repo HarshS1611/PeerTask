@@ -8,6 +8,7 @@ import sendNotif from '@/utils/notifications';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Router from 'next/router';
+import { useAuth } from '@arcana/auth-react'
 const Modal = ({
     setModalOpen,
     tasksData,

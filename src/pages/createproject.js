@@ -15,6 +15,8 @@ import Router from 'next/router';
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { rpcURLnetwork , authArcana } from "../utils/authArcana";
+
 
 export default function CreateProject() {
     const [fileUrl, setFileUrl] = useState(null);
@@ -56,7 +58,8 @@ export default function CreateProject() {
             // const connection = await web3Modal.connect();
             // const provider = new ethers.providers.Web3Provider(connection);
             // const signer = provider.getSigner();
-
+            await authArcana.init();
+            const info = await authArcana.getUser();
 
             const Provider = new ethers.providers.Web3Provider(provider);
             const signer = Provider.getSigner();
