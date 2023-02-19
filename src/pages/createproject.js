@@ -6,7 +6,9 @@ import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS, client } from '../utils/ipfs'
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Router from 'next/router';
 
 export default function CreateProject() {
     const [fileUrl, setFileUrl] = useState(null);
@@ -52,7 +54,19 @@ export default function CreateProject() {
             console.log(uri)
             const tx = await jobPortal.createProject(uri);
             await tx.wait();
-            console.log("Project created!");
+            toast.success("Project created!");
+            // console.log("Project created!");
+            // set all the values to empty string and redirect to my projects page
+            setProjectData({
+                title: '',
+                description: '',
+                category: '',
+                skills: '',
+                image: '',
+                duration: '',
+            })
+            setFileUrl(null)
+            Router.push('/myprojects')
         } catch (err) {
             console.log("Error: ", err);
         }
@@ -168,6 +182,7 @@ export default function CreateProject() {
 
                 </form>
             </div>
+            <ToastContainer />
 
         </>
 
