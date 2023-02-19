@@ -20,7 +20,7 @@ export default function TaskInfo() {
   let projectId = asPath.split("/")[3];
   let taskId = asPath.split("/")[4];
   const [proposalView, setProposalView] = useState([]);
-  const [address, setAddress] = useState(false);
+  const [address, setAddress] = useState("");
 
   async function callMetaMask() {
     const web3Modal = new Web3Modal();
@@ -32,11 +32,10 @@ export default function TaskInfo() {
       JobPortal.abi,
       signer
     );
-    await getTask(jobPortal);
-    await getProposals(jobPortal, signer);
+    await getTask(jobPortal, signer);
   }
 
-  async function getTask(jobPortal) {
+  async function getTask(jobPortal, signer) {
     console.log("tasks");
 
     // Get task details
@@ -61,11 +60,10 @@ export default function TaskInfo() {
     // Get Project Manager
     const project = await jobPortal.projects(projectId);
     taskObj.projectManager = project.projectManager;
-    setDisplayTaskDetails(taskObj);
-    console.log(taskDisplayDetails);
-  }
+    console.log("taskObj" + JSON.stringify(taskObj));
+    // setDisplayTaskDetails(taskObj);
+    console.log("taskDeiaply" + taskDisplayDetails);
 
-  async function getProposals(jobPortal, signer) {
     const proposalDetails = await jobPortal.getProposalsByTaskId(
       projectId,
       taskId
@@ -85,8 +83,9 @@ export default function TaskInfo() {
         // setOnGoing(proposalDetails[i][1]);
           
           // set isWaiting to true
-          setDisplayTaskDetails({...taskDisplayDetails, isWaiting: true});
-          setDisplayTaskDetails({ ...taskDisplayDetails, onGoing: true });
+        taskObj.isWaiting = proposalDetails[i][0];
+        taskObj.onGoing = proposalDetails[i][1];
+          setDisplayTaskDetails(taskObj);
         setAddress(await signer.getAddress());
         setProposalView(proposalDetails[i][3]);
       }
@@ -189,7 +188,8 @@ export default function TaskInfo() {
           {proposalView.length == 0 &&
             !taskDisplayDetails.onGoing &&
             !taskDisplayDetails.isComplete &&
-            !taskDisplayDetails.isReviewed && (
+            !taskDisplayDetails.isReviewed &&
+            (
               <button
                 onClick={() => setModal(true)}
                 className="
