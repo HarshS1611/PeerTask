@@ -29,7 +29,12 @@ const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
             console.log(uri)
             const tx = await jobPortal.completeTaskWorker(projectId, taskId);
             await tx.wait();
-            console.log("Project created!");
+            console.log("Task completed!");
+
+            // send notification to the manager
+            const project = await jobPortal.projects(projectId);
+            await sendNotif([project.projectManager], `Task ${taskId} of project ${projectId} is completed!`, `Task ${taskId} of project ${projectId} is completed by the developer `)
+
         } catch (err) {
             console.log("Error: ", err);
         }

@@ -3,9 +3,11 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
-import { uploadToIPFS, client } from '../utils/ipfs'
-import { useAuth } from "@arcana/auth-react";
-
+import { uploadToIPFS } from '../utils/ipfs'
+import sendNotif from '@/utils/notifications';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Router from 'next/router';
 const Modal = ({
     setModalOpen,
     tasksData,
@@ -35,7 +37,20 @@ const Modal = ({
                 value: stakedAmt,
             });
             await tx.wait();
-            console.log("Task created!");
+            toast.success("Task added successfully!");
+            setTasksData({
+                taskName: '',
+                taskDescription: '',
+                stakedAmount: '',
+                taskDuration: '',
+            })
+            setTimeout(() => {
+                Router.push(`/myprojectview/${id}`)
+            }, 5000)
+
+            // Send notification to manager
+            await sendNotif([await signer.getAddress()], `Task ${tasksData.taskName} is added to PeerTask!`, `Task ${tasksData.taskName} is now available for developers `)
+            setModalOpen(false)
         } catch (err) {
             console.log("Error: ", err);
         }
@@ -124,6 +139,7 @@ const Modal = ({
 
                 </div>
             </div>
+            <ToastContainer />
         </div>
     )
 }

@@ -1,7 +1,10 @@
 import React from 'react'
 import Router from 'next/router';
 import Head from 'next/head';
-import { Auth, useAuth } from "@arcana/auth-react";
+import Web3Modal from "web3modal";
+import { ethers } from "ethers";
+import * as PushAPI from "@pushprotocol/restapi";
+
 export default function Login() {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -26,6 +29,33 @@ export default function Login() {
     };
   }, [provider]);
 
+<<<<<<< HEAD
+=======
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    console.log(email, password)
+
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+
+    let apiResponse = await PushAPI.channels.subscribe({
+      signer: signer,
+      channelAddress: 'eip155:5:0x42082772D74F5E48E25f7663D98351C40A9CE9db', // channel address in CAIP
+      userAddress: 'eip155:5:' + await signer.getAddress(), // user address in CAIP
+      onSuccess: () => {
+        console.log('opt in success');
+      },
+      onError: () => {
+        console.error('opt in error');
+      },
+      env: 'staging'
+    })
+
+    Router.push('/home')
+  }
+>>>>>>> push
   // TODO: Integrate Arcana Login
   return (
     <>
@@ -50,7 +80,7 @@ export default function Login() {
 
           <p className="mt-8 text-xs font-light text-center text-white">
             {" "}
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a
               href="#"
               className="font-medium text-[#0284c7] hover:underline"

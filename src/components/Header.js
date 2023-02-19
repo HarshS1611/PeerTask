@@ -23,6 +23,12 @@ function Header() {
                         className="hidden md:flex items-center bg-transparent text-white text-lg px-5 py-2 border border-white-500 rounded-xl">
                         My Projects
                     </button>
+                    <button
+                        onClick={() => Router.push('/notifications')}
+                        className="hidden md:flex items-center bg-transparent text-white text-lg px-5 py-2 border border-white-500 rounded-xl"
+                    >
+                        <Image src="/bell.png" width={25} height={100} alt="Notifications" />
+                    </button>
 
                 </div >
             </header >

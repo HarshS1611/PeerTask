@@ -6,7 +6,12 @@ import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPor
 import { ethers } from "ethers";
 import { uploadToIPFS, client } from '../utils/ipfs'
 import Router from 'next/router';
+<<<<<<< HEAD
 import { Auth, useAuth } from "@arcana/auth-react";
+=======
+import sendNotif from '@/utils/notifications';
+
+>>>>>>> push
 
 
 export default function ProposalModal({ setModal }) {
@@ -17,13 +22,15 @@ export default function ProposalModal({ setModal }) {
         proposalDetails: '',
         duration: 0,
     });
-    const { provider } = useAuth();
+
+    // get projectId and taskId from url
     const { asPath } = useRouter()
     let projectId = asPath.split('/')[3];
     console.log(projectId);
     let taskId = asPath.split('/')[4];
     console.log(taskId);
 
+    // submit proposal
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(proposal);
@@ -39,6 +46,16 @@ export default function ProposalModal({ setModal }) {
         console.log(uri);
         const tx = await jobPortal.sendProposal(projectId, taskId, proposal.bid, proposal.motivation, uri);
         await tx.wait();
+
+        // send notification to the user
+        await sendNotif([await signer.getAddress()], `Proposal for task ${taskId} is submitted!`, `Proposal for task ${taskId} is submitted!`)
+
+        // send notification to the manager
+        // get project details
+        const project = await jobPortal.projects(projectId);
+        console.log("ProjectManager: ", project.projectManager)
+        await sendNotif([project.projectManager], `Proposal for task ${taskId} is submitted by user!`, `Please review the proposal for task ${taskId}.`)
+
         Router.push(`/viewproject/viewtask/${projectId}/${taskId}`);
     };
 

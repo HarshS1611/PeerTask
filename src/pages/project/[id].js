@@ -123,7 +123,6 @@ const ProjectInfo = () => {
                         ))}
                     </tbody> */}
                 </table>
-                <button className="bg-[#0284c7] text-white text-lg px-5 py-2 rounded-xl mt-5" onClick={handleSubmit}>Submit</button>
             </section>
         </>
     )

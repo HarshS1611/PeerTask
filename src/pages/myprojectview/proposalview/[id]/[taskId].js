@@ -23,80 +23,76 @@ export default function TaskInfo() {
     let taskId = asPath.split('/')[4];
     // console.log(taskId);
     const [proposals, setProposal] = useState([]);
+
+    async function callMetaMask() {
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const jobPortal = new ethers.Contract(
+            contractAddress,
+            JobPortal.abi,
+            signer
+        );
+        await getTask(jobPortal);
+        await getProposals(jobPortal);
+    }
+
+    async function getTask(jobPortal) {
+        console.log("tasks");
+        const task = await jobPortal.getTaskData(projectId, taskId);
+        console.log(task);
+        const meta = await axios.get(task[0]);
+        // console.log(meta.data);
+        // convert the array to object
+        const taskObj = {
+            uri: task[0],
+            Id: task[1].toNumber(),
+            stakedAmount: task[2].toNumber(),
+            proposalCount: task[3].toNumber(),
+            worker: task[4],
+            isComplete: task[5],
+            isReviewed: task[6],
+            onGoing: task[7],
+            taskName: meta.data.taskName,
+            taskDescription: meta.data.taskDescription,
+            taskDuration: meta.data.taskDuration,
+        };
+        console.log(taskObj);
+        setDisplayTaskDetails(taskObj);
+    }
+
+    async function getProposals(jobPortal) {
+        console.log("proposal");
+        const proposalDetails = await jobPortal.getProposalsByTaskId(projectId, taskId);
+        console.log(proposalDetails);
+        if (proposalDetails.length === 0) {
+            return;
+        }
+        const data = await Promise.all(
+            proposalDetails.map(async (proposals) => {
+                const meta = await axios.get(proposals[2]);
+                console.log(meta.data);
+                // convert the array to object
+                const proposalObj = {
+                    uri: proposals[2],
+                    worker: proposals[3],
+                    bid: proposals[4].toNumber(),
+                    motivation: meta.data.motivation,
+                    proposalDescription: meta.data.proposalDetails,
+                    projectId: projectId,
+                    taskId: taskId,
+                    // setDisplayTaskDetails(proposalObj);
+                }
+                return proposalObj;
+            }))
+        console.log(data);
+        setProposal(data);
+        console.log(proposals);
+    }
+
     useEffect(() => {
-        async function getTask() {
-            console.log("tasks");
-            // const web3Modal = new Web3Modal();
-            // const connection = await web3Modal.connect();
-            // const provider = new ethers.providers.Web3Provider(connection);
-            // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
-            const jobPortal = new ethers.Contract(
-                contractAddress,
-                JobPortal.abi,
-                provider
-            );
-            const task = await jobPortal.getTaskData(projectId, taskId);
-            console.log(task);
-            const meta = await axios.get(task[0]);
-            // console.log(meta.data);
-            // convert the array to object
-            const taskObj = {
-                uri: task[0],
-                Id: task[1].toNumber(),
-                stakedAmount: task[2].toNumber() ,
-                proposalCount: task[3].toNumber(),
-                worker: task[4],
-                isComplete: task[5],
-                isReviewed: task[6],
-                onGoing: task[7],
-                taskName: meta.data.taskName,
-                taskDescription: meta.data.taskDescription,
-                taskDuration: meta.data.taskDuration,
-            };
-            console.log(taskObj);
-            setDisplayTaskDetails(taskObj);
-        }
-        getTask();
-        async function getProposals() {
-            console.log("proposal");
-            // const web3Modal = new Web3Modal();
-            // const connection = await web3Modal.connect();
-            // const provider = new ethers.providers.Web3Provider(connection);
-            // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
-            const jobPortal = new ethers.Contract(
-                contractAddress,
-                JobPortal.abi,
-                provider
-            );
-            const proposalDetails = await jobPortal.getProposalsByTaskId(projectId, taskId);
-            console.log(proposalDetails);
-            if (proposalDetails.length === 0) {
-                return;
-            }
-            const data = await Promise.all(
-                proposalDetails.map(async (proposals) => {
-                    const meta = await axios.get(proposals[2]);
-                    console.log(meta.data);
-                    // convert the array to object
-                    const proposalObj = {
-                        uri: proposals[2],
-                        worker: proposals[3],
-                        bid: proposals[4].toNumber(),
-                        motivation: meta.data.motivation,
-                        proposalDescription: meta.data.proposalDetails,
-                        projectId: projectId,
-                        taskId: taskId,
-                        // setDisplayTaskDetails(proposalObj);
-                    }
-                    return proposalObj;
-                }))
-            console.log(data);
-            setProposal(data);
-            console.log(proposals);
-        }
-        getProposals();
+        callMetaMask();
     }, []);
 
 

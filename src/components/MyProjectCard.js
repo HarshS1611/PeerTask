@@ -15,16 +15,16 @@ const MyProjectCard = ({ project }) => {
             </div>
             {/* Content div-RHS */}
             <div className='flex flex-col flex-grow pl-5'>
-                <div className='flex justify-between'>
-                    <p>location</p>
-                    {/* <HeartIcon className="h-7 cursor-pointer" /> */}
-                </div>
-                <h4 className="text-xl">{project.title}</h4>
+                <h4 className="text-2xl font-bold">{project.title}</h4>
                 <div className="border-b w-10 pt-2" />
-                <p className="pt-2 text-sm text-gray-500 flex-grow">{project.description}</p>
-
+                <p className="pt-2 text-lg text-white">{project.description}</p>
+                <div className="flex items-center mt-5">
+                    <span className="text-white bg-slate-700 rounded-xl text-lg px-2 py-1">{
+                        project.category
+                    }</span>
+                </div>
                 {/* Price div */}
-                <div className="flex justify-between items-end pt-5">
+                <div className="flex justify-between items-end mt-8">
                     {/* Buttons to edit project and view project */}
                     <div className="flex space-x-4 items-center justify-end text-gray-500">
                         <Link href={`/project/${project.id}`}>
@@ -38,10 +38,7 @@ const MyProjectCard = ({ project }) => {
                             ">View Project</button>
                         </Link>
                     </div>
-                    <div>
-                        <p className="text-lg lg:text-2xl font-semibold pb-2">price</p>
-                        <p className="text-right font-extralight">total</p>
-                    </div>
+
                 </div>
             </div>
         </div>

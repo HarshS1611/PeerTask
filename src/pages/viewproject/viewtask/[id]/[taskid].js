@@ -24,113 +24,109 @@ export default function TaskInfo() {
     let taskId = asPath.split("/")[4];
     // console.log(taskId);
     const [proposalView, setProposalView] = useState([]);
-    const [isAddress, setIsAddress] = useState(false);
+    const [isAddress, setIsAddress] = useState("");
     const [isWaiting, setIsWaiting] = useState(false);
     const [onGoing, setOnGoing] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
     const [isReviewed, setIsReviewed] = useState(false);
 
+    async function callMetaMask() {
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const jobPortal = new ethers.Contract(
+            contractAddress,
+            JobPortal.abi,
+            signer
+        );
+        await getTask(jobPortal);
+        await getProposals(jobPortal);
+        setIsAddress(await signer.getAddress());
+    }
+
+    async function getTask(jobPortal) {
+        console.log("tasks");
+
+        const task = await jobPortal.getTaskData(projectId, taskId);
+        console.log("task" + JSON.stringify(task));
+        setIsCompleted(task[5]);
+        setIsReviewed(task[6]);
+
+        const meta = await axios.get(task[0]);
+        // console.log(meta.data);
+        // convert the array to object
+        const taskObj = {
+            uri: task[0],
+            Id: task[1].toNumber(),
+            stakedAmount: task[2].toNumber(),
+            proposalCount: task[3].toNumber(),
+            worker: task[4],
+            isComplete: task[5],
+            isReviewed: task[6],
+            onGoing: task[7],
+            taskName: meta.data.taskName,
+            taskDescription: meta.data.taskDescription,
+            taskDuration: meta.data.taskDuration,
+        };
+        // console.log(taskObj);
+        setDisplayTaskDetails(taskObj);
+    }
+
+    async function getProposals(jobPortal) {
+        const proposalDetails = await jobPortal.getProposalsByTaskId(
+            projectId,
+            taskId
+        );
+        console.log(proposalDetails);
+        // console.log("myaddress" + typeof signer.getAddress());
+        if (proposalDetails.length === 0) {
+            return;
+        }
+        console.log("proposalDetails" + proposalDetails);
+
+        for (let i = 0; i < proposalDetails.length; i++) {
+            console.log(proposalDetails[i][3]);
+            // console.log(await signer.getAddress());
+            if (proposalDetails[i][3] === await signer.getAddress()) {
+                setIsWaiting(proposalDetails[i][0]);
+                setOnGoing(proposalDetails[i][1]);
+                setIsAddress(true);
+                setProposalView(proposalDetails[i][3]);
+            }
+        }
+
+        // const data = await Promise.all(
+        //   proposalDetails.map(async (proposals) => {
+        //     console.log("proposals" + proposals);
+        //     if (proposals[3] == (await signer.getAddress())) {
+        //       await setIsWaiting(proposals[0]);
+        //       await setOnGoing(proposals[1]);
+
+        //       await setIsAddress(true);
+        //       const meta = await axios.get(proposals[2]);
+        //       // console.log(meta.data);
+        //       // // convert the array to object
+        //       const proposalObj = {
+        //         uri: proposals[2],
+        //         worker: proposals[3],
+        //         bid: proposals[4].toNumber(),
+        //         motivation: meta.data.motivation,
+        //         proposalDescription: meta.data.proposalDetails,
+        //       };
+        //       return proposalObj;
+        //     }
+        //   })
+        // );
+        // console.log("proposal data" + data);
+        // // console.log(isAddress);
+        // setProposalView(data);
+        // // console.log(proposalView);
+    }
     useEffect(() => {
-        async function getTask() {
-            console.log("tasks");
-            // const web3Modal = new Web3Modal();
-            // const connection = await web3Modal.connect();
-            // const provider = new ethers.providers.Web3Provider(connection);
-            // const signer = provider.getSigner();
-            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
-            const jobPortal = new ethers.Contract(
-                contractAddress,
-                JobPortal.abi,
-                provider
-            );
-            const task = await jobPortal.getTaskData(projectId, taskId);
-            console.log("task" + JSON.stringify(task));
-            await setIsCompleted(task[5]);
-            await setIsReviewed(task[6]);
-
-            const meta = await axios.get(task[0]);
-            // console.log(meta.data);
-            // convert the array to object
-            const taskObj = {
-                uri: task[0],
-                Id: task[1].toNumber(),
-                stakedAmount: task[2].toNumber(),
-                proposalCount: task[3].toNumber(),
-                worker: task[4],
-                isComplete: task[5],
-                isReviewed: task[6],
-                onGoing: task[7],
-                taskName: meta.data.taskName,
-                taskDescription: meta.data.taskDescription,
-                taskDuration: meta.data.taskDuration,
-            };
-            // console.log(taskObj);
-            setDisplayTaskDetails(taskObj);
-        }
-        getTask();
-        async function getProposals() {
-            // const web3Modal = new Web3Modal();
-            // const connection = await web3Modal.connect();
-            // const provider = new ethers.providers.Web3Provider(connection);
-            // const signer = provider.getSigner();
-            await authArcana.init();
-            const info = await authArcana.getUser();
-            const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork)
-            const jobPortal = new ethers.Contract(
-                contractAddress,
-                JobPortal.abi,
-                provider
-            );
-            const proposalDetails = await jobPortal.getProposalsByTaskId(
-                projectId,
-                taskId
-            );
-            console.log(proposalDetails);
-            console.log("myaddress" + typeof info.address);
-            if (proposalDetails.length === 0) {
-                return;
-            }
-            console.log("proposalDetails" + proposalDetails);
-
-            for (let i = 0; i < proposalDetails.length; i++) {
-                console.log(proposalDetails[i][3]);
-                console.log(await info.address);
-                if (proposalDetails[i][3] == (await info.address)) {
-                    await setIsWaiting(proposalDetails[i][0]);
-                    await setOnGoing(proposalDetails[i][1]);
-                    await setIsAddress(true);
-                    setProposalView(proposalDetails[i][3]);
-                }
-            }
-
-            // const data = await Promise.all(
-            //   proposalDetails.map(async (proposals) => {
-            //     console.log("proposals" + proposals);
-            //     if (proposals[3] == (await signer.getAddress())) {
-            //       await setIsWaiting(proposals[0]);
-            //       await setOnGoing(proposals[1]);
-
-            //       await setIsAddress(true);
-            //       const meta = await axios.get(proposals[2]);
-            //       // console.log(meta.data);
-            //       // // convert the array to object
-            //       const proposalObj = {
-            //         uri: proposals[2],
-            //         worker: proposals[3],
-            //         bid: proposals[4].toNumber(),
-            //         motivation: meta.data.motivation,
-            //         proposalDescription: meta.data.proposalDetails,
-            //       };
-            //       return proposalObj;
-            //     }
-            //   })
-            // );
-            // console.log("proposal data" + data);
-            // // console.log(isAddress);
-            // setProposalView(data);
-            // // console.log(proposalView);
-        }
-        getProposals();
+        console.log("useeffect");
+        callMetaMask();
+        console.log("after useeffect");
     }, []);
 
     // const handleSubmit = async (event) => {
@@ -224,15 +220,15 @@ export default function TaskInfo() {
                         <button
                             onClick={() => setModal(true)}
                             className="
-                          bg-[#0284c7]
-                          text-white
-                          font-semibold
-                          rounded-xl
-                          px-4
-                          py-2
-                          mt-4
-                          md:ml-2
-                      "
+                                bg-[#0284c7]
+                                text-white
+                                font-semibold
+                                rounded-xl
+                                px-4
+                                py-2
+                                mt-4
+                                md:ml-2
+                            "
                         >
                             Submit Proposal
                         </button>
@@ -242,15 +238,15 @@ export default function TaskInfo() {
                         <h1 className="mt-10">
                             <span
                                 className="
-                        bg-yellow-500
-                        text-black
-                        font-semibold
-                        rounded-xl
-                        px-4
-                        py-2
-                        mt-10
-                        md:ml-2
-                    "
+                                bg-yellow-500
+                                text-black
+                                font-semibold
+                                rounded-xl
+                                px-4
+                                py-2
+                                mt-10
+                                md:ml-2
+                            "
                             >
                                 Waiting
                             </span>
@@ -260,15 +256,15 @@ export default function TaskInfo() {
                         <button
                             onClick={() => setTaskModal(true)} // a different modal for submitting task
                             className="
-                        bg-[#0b3044]
-                        text-white
-                        font-semibold
-                        rounded-xl
-                        px-4
-                        py-2
-                        mt-4
-                        md:ml-2
-                    "
+                                bg-[#0b3044]
+                                text-white
+                                font-semibold
+                                rounded-xl
+                                px-4
+                                py-2
+                                mt-4
+                                md:ml-2
+                            "
                         >
                             Submit Task
                         </button>
@@ -277,15 +273,15 @@ export default function TaskInfo() {
                         <h1 className="mt-10">
                             <span
                                 className="
-                        bg-green-700
-                        text-black
-                        font-semibold
-                        rounded-xl
-                        px-4
-                        py-2
-                        mt-10
-                        md:ml-2
-                    "
+                                    bg-green-700
+                                    text-black
+                                    font-semibold
+                                    rounded-xl
+                                    px-4
+                                    py-2
+                                    mt-10
+                                    md:ml-2
+                                "
                             >
                                 Completed, Waiting for review
                             </span>

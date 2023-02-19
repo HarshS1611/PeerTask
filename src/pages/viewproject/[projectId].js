@@ -17,9 +17,9 @@ const ProjectInfo = () => {
     const { projectId } = router.query;
     const [projectData, setProjectData] = useState([]);
     const [tasks, setTasks] = useState([]);
-    
-    async function checkAvailable(filteredTasks, jobPortal,  info) {
-        for(let i = 0; i < filteredTasks.length; i++) {
+
+    async function checkAvailable(filteredTasks, jobPortal, signer) {
+        for (let i = 0; i < filteredTasks.length; i++) {
             let task = filteredTasks[i];
             const proposals = await jobPortal.getProposalsByTaskId(projectId, task.Id);
             console.log(proposals);
@@ -32,19 +32,32 @@ const ProjectInfo = () => {
         return filteredTasks;
     }
 
+<<<<<<< HEAD
     async function getJobportalandSigner() {
         // const web3Modal = new Web3Modal();
         // const connection = await web3Modal.connect();
         // const provider = new ethers.providers.Web3Provider(connection);
         // const signer = provider.getSigner();
         const provider = new ethers.providers.JsonRpcProvider(rpcURLnetwork);
+=======
+    async function callMetaMask() {
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+>>>>>>> push
         const jobPortal = new ethers.Contract(
             contractAddress,
             JobPortal.abi,
             provider
         );
+<<<<<<< HEAD
         getTasks(jobPortal, provider);
         getProject(jobPortal, provider);
+=======
+        await getTasks(jobPortal, signer);
+        await getProject(jobPortal, signer);
+>>>>>>> push
     }
 
     async function getTasks(jobPortal, provider) {
@@ -58,8 +71,8 @@ const ProjectInfo = () => {
 
 
         const data = await Promise.all(
-            tasksArr.map(async (t) => {
-                const task = await jobPortal.getTaskData(projectId, t);
+            tasksArr.map(async (task) => {
+                task = await jobPortal.getTaskData(projectId, task);
                 const meta = await axios.get(task[0]);
                 console.log(meta);
                 // convert the array to object
@@ -124,7 +137,7 @@ const ProjectInfo = () => {
     }
 
     useEffect(() => {
-        getJobportalandSigner();
+        callMetaMask();
 
     }, []);
 

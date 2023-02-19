@@ -33,6 +33,7 @@ const TaskCard = ({
                     {
                         task.taskDuration
                     }
+                    &nbsp;Days
                 </td>
                 {task.isReviewed ? (
                     <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
@@ -55,7 +56,7 @@ const TaskCard = ({
                         <span className='
                                 text-sm
                                 md:ml-3
-                                bg-green-700
+                                bg-green-900
                                 rounded-xl
                                 px-2
                                 py-1
@@ -114,7 +115,7 @@ const TaskCard = ({
                         font-semibold
                     '
                         >
-                            Not Available
+                            Waiting
                         </span>
                     </td>
                     )
