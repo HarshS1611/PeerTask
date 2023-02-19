@@ -86,7 +86,7 @@ export default function TaskInfo() {
         for (let i = 0; i < proposalDetails.length; i++) {
             console.log(proposalDetails[i][3]);
             // console.log(await signer.getAddress());
-            if (proposalDetails[i][3] === isAddress) {
+            if (proposalDetails[i][3] === await signer.getAddress()) {
                 setIsWaiting(proposalDetails[i][0]);
                 setOnGoing(proposalDetails[i][1]);
                 setIsAddress(true);
