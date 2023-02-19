@@ -10,115 +10,119 @@ import Web3Modal from "web3modal";
 import axios from "axios";
 import TaskCard from "@/components/TaskCard";
 
+
+
 const ProjectInfo = () => {
-    const [available, setAvailable] = useState(false);
     const router = useRouter();
     const { projectId } = router.query;
     const [projectData, setProjectData] = useState([]);
     const [tasks, setTasks] = useState([]);
-    useEffect(() => {
-        async function getTasks() {
-            console.log("tasks");
-            let tasksArr = [];
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
-            const jobPortal = new ethers.Contract(
-                contractAddress,
-                JobPortal.abi,
-                signer
-            );
 
-            const cnt = await jobPortal.getTaskCountByProjectId(projectId);
-            for (let i = 0; i <= cnt.toNumber(); i++) {
-                tasksArr.push(i);
-            }
-
-
-            const data = await Promise.all(
-                tasksArr.map(async (t) => {
-                    const task = await jobPortal.getTaskData(projectId, t);
-                    const meta = await axios.get(task[0]);
-                    console.log(meta);
-                    // convert the array to object
-                    console.log(task);
-                    const taskObj = {
-                        uri: task[0],
-                        Id: task[1].toNumber(),
-                        stakedAmount: task[2].toNumber(),
-                        proposalCount: task[3].toNumber(),
-                        worker: task[4],
-                        isComplete: task[5],
-                        isReviewed: task[6],
-                        taskName: meta.data.taskName,
-                        taskDescription: meta.data.taskDescription,
-                        taskDuration: meta.data.taskDuration,
-                    };
-                    // convert the uri to specific details such as name and description
-                    // console.log(taskObj.uri);
-                    return taskObj;
-                })
-            );
-            // setProjectsData(data);
-            console.log(data);
-            // setTasks(data);
-            // filter each task to remove all undefined ad null values
-            const filteredTasks = data.filter(
-                (task) =>
-                    task.taskName !== undefined || task.taskDescription !== undefined
-            );
-            console.log(filteredTasks);
-            setTasks(filteredTasks);
-            console.log(tasks);
-            filteredTasks.forEach(async (task) => {
-                const proposals = await jobPortal.getProposalsByTaskId(projectId, task.Id);
-                console.log(proposals);
-                proposals.forEach(async (proposal) => {
-                    // console.log(typeof (proposal[3]));
-                    // console.log(typeof (task.worker));
-                    if (proposal[3] !== task.worker) {
-                        console.log("available");
-                        setAvailable(true);
-                    }
-                });
+    async function checkAvailable(filteredTasks, jobPortal, signer) {
+        for(let i = 0; i < filteredTasks.length; i++) {
+            let task = filteredTasks[i];
+            const proposals = await jobPortal.getProposalsByTaskId(projectId, task.Id);
+            console.log(proposals);
+            proposals.forEach(async (proposal) => {
+                if (proposal[3] === await signer.getAddress()) {
+                    task.isAvailable = false;
+                }
             });
+        };
+        return filteredTasks;
+    }
+
+    async function getJobportalandSigner() {
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const jobPortal = new ethers.Contract(
+            contractAddress,
+            JobPortal.abi,
+            signer
+        );
+        getTasks(jobPortal, signer);
+        getProject(jobPortal, signer);
+    }
+
+    async function getTasks(jobPortal, signer) {
+        console.log("tasks");
+        let tasksArr = [];
+
+        const cnt = await jobPortal.getTaskCountByProjectId(projectId);
+        for (let i = 0; i <= cnt.toNumber(); i++) {
+            tasksArr.push(i);
         }
-        getTasks();
-        // Get a project by its id
-        // Get all tasks for that project
-        // Display all tasks
-        async function getProject() {
-            console.log("project");
-            const web3Modal = new Web3Modal();
-            const connection = await web3Modal.connect();
-            const provider = new ethers.providers.Web3Provider(connection);
-            const signer = provider.getSigner();
-            const jobPortal = new ethers.Contract(
-                contractAddress,
-                JobPortal.abi,
-                signer
-            );
-            const project = await jobPortal.projects(projectId);
-            const meta = await axios.get(project[0]);
-            console.log(meta);
-            // convert the array to object
-            const projectObj = {
-                uri: project[0],
-                id: project[1].toNumber(),
-                manager: project[2],
-                taskCount: project[3].toNumber(),
-                title: meta.data.title,
-                skills: meta.data.skills,
-                image: meta.data.image,
-                duration: meta.data.duration,
-                description: meta.data.description,
-                category: meta.data.category,
-            };
-            console.log(projectObj);
-            setProjectData(projectObj);
-        }
-        getProject();
+
+
+        const data = await Promise.all(
+            tasksArr.map(async (t) => {
+                const task = await jobPortal.getTaskData(projectId, t);
+                const meta = await axios.get(task[0]);
+                console.log(meta);
+                // convert the array to object
+                console.log(task);
+                const taskObj = {
+                    uri: task[0],
+                    Id: task[1].toNumber(),
+                    stakedAmount: task[2].toNumber(),
+                    proposalCount: task[3].toNumber(),
+                    worker: task[4],
+                    isComplete: task[5],
+                    isReviewed: task[6],
+                    isAvailable: true,
+                    onGoing: task[7],
+                    taskName: meta.data.taskName,
+                    taskDescription: meta.data.taskDescription,
+                    taskDuration: meta.data.taskDuration,
+                };
+                // convert the uri to specific details such as name and description
+                // console.log(taskObj.uri);
+                return taskObj;
+            })
+        );
+        // setProjectsData(data);
+        // console.log(data);
+        // setTasks(data);
+        // filter each task to remove all undefined ad null values
+        let filteredTasks = data.filter(
+            (task) =>
+                task.taskName !== undefined || task.taskDescription !== undefined
+        );
+        filteredTasks = await checkAvailable(filteredTasks, jobPortal, signer);
+        console.log(filteredTasks)
+        setTasks(filteredTasks);
+    }
+
+    // Get a project by its id
+    // Get all tasks for that project
+    // Display all tasks
+    async function getProject(jobPortal, signer) {
+        console.log("project");
+        const project = await jobPortal.projects(projectId);
+        const meta = await axios.get(project[0]);
+        console.log(meta);
+        // convert the array to object
+        const projectObj = {
+            uri: project[0],
+            id: project[1].toNumber(),
+            manager: project[2],
+            taskCount: project[3].toNumber(),
+            title: meta.data.title,
+            skills: meta.data.skills,
+            image: meta.data.image,
+            duration: meta.data.duration,
+            description: meta.data.description,
+            category: meta.data.category,
+        };
+        console.log(projectObj);
+        setProjectData(projectObj);
+    }
+
+    useEffect(() => {
+        getJobportalandSigner();
+
     }, []);
 
     return (
@@ -196,9 +200,7 @@ const ProjectInfo = () => {
                             </tr>
                         </thead>
                         {tasks.map((task) => (
-                            <TaskCard key={task.Id} task={task} id={projectId}
-                                available={available}
-                            />
+                            <TaskCard key={task.Id} task={task} id={projectId} />
                         ))}
                     </table>
                 ) : (
