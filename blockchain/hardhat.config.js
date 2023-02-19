@@ -32,15 +32,11 @@ module.exports = {
     //   gas: 2100000,
     //   gasPrice: 8000000000,
     // },
-    goerli: {
-      url: "https://rpc.ankr.com/eth_goerli",
-      accounts: [PRIVATE_KEY],
+    mantle_testnet: {
+      chainId: 5001,
+      url: "https://rpc.testnet.mantle.xyz/",
+      accounts: [PRIVATE_KEY ?? "undefined"],
     },
-    hyperspace: {
-      chainId: 3141,
-      url: "https://api.hyperspace.node.glif.io/rpc/v1",
-      accounts: [PRIVATE_KEY],
-  },
   },
   etherscan: {
     apiKey: {
