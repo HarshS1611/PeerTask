@@ -37,7 +37,7 @@ const AdminTaskCard = ({
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                     {
-                        task.taskStatus
+                        task.status
                     }
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">

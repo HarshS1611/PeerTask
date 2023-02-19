@@ -1,29 +1,33 @@
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import Header from '@/components/Header'
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Header from "@/components/Header";
 import Web3Modal from "web3modal";
 import { contractAddress } from "../../../../../blockchain/config";
 import JobPortal from "../../../../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json";
 import { ethers } from "ethers";
-import Head from "next/head"
-import ProposalModal from '@/components/ProposalModal'
-import TaskSubmitModal from '@/components/TaskSubmitModal'
-import axios from 'axios'
-
+import Head from "next/head";
+import ProposalModal from "@/components/ProposalModal";
+import TaskSubmitModal from "@/components/TaskSubmitModal";
+import axios from "axios";
 
 export default function TaskInfo() {
-    const [modal, setModal] = useState(false)
-    const [taskModal, setTaskModal] = useState(false)
-    const router = useRouter()
-    const { asPath } = useRouter()
+    const [modal, setModal] = useState(false);
+    const [taskModal, setTaskModal] = useState(false);
+    const router = useRouter();
+    const { asPath } = useRouter();
     const [taskDisplayDetails, setDisplayTaskDetails] = useState([]);
     // console.log(asPath);
-    let projectId = asPath.split('/')[3];
+    let projectId = asPath.split("/")[3];
     // console.log(projectId);
-    let taskId = asPath.split('/')[4];
+    let taskId = asPath.split("/")[4];
     // console.log(taskId);
     const [proposalView, setProposalView] = useState([]);
-    const [isAddress, setIsAddress] = useState(false)
+    const [isAddress, setIsAddress] = useState(false);
+    const [isWaiting, setIsWaiting] = useState(false);
+    const [onGoing, setOnGoing] = useState(false);
+    const [isCompleted, setIsCompleted] = useState(false);
+    const [isReviewed, setIsReviewed] = useState(false);
+
     useEffect(() => {
         async function getTask() {
             console.log("tasks");
@@ -37,11 +41,13 @@ export default function TaskInfo() {
                 signer
             );
             const task = await jobPortal.getTaskData(projectId, taskId);
-            console.log(task[0]);
+            console.log("task" + JSON.stringify(task));
+            await setIsCompleted(task[5]);
+            await setIsReviewed(task[6]);
+
             const meta = await axios.get(task[0]);
             // console.log(meta.data);
             // convert the array to object
-            console.log(task);
             const taskObj = {
                 uri: task[0],
                 Id: task[1].toNumber(),
@@ -50,12 +56,12 @@ export default function TaskInfo() {
                 worker: task[4],
                 isComplete: task[5],
                 isReviewed: task[6],
+                onGoing: task[7],
                 taskName: meta.data.taskName,
                 taskDescription: meta.data.taskDescription,
                 taskDuration: meta.data.taskDuration,
-
             };
-            console.log(taskObj);
+            // console.log(taskObj);
             setDisplayTaskDetails(taskObj);
         }
         getTask();
@@ -69,54 +75,64 @@ export default function TaskInfo() {
                 JobPortal.abi,
                 signer
             );
-            const proposalDetails = await jobPortal.getProposalsByTaskId(projectId, taskId);
-            console.log("proposalDesails" + proposalDetails);
-            console.log("myaddress" + typeof signer.getAddress())
+            const proposalDetails = await jobPortal.getProposalsByTaskId(
+                projectId,
+                taskId
+            );
+            console.log(proposalDetails);
+            console.log("myaddress" + typeof signer.getAddress());
             if (proposalDetails.length === 0) {
                 return;
             }
-            const data = await Promise.all(
-                proposalDetails.map(async (proposals) => {
-                    console.log("proposals" + proposals[1]);
-                    if (proposals[1] == await signer.getAddress()) {
-                        console.log("inside proposal map if cond")
-                        console.log("proposals" + proposals[1])
-                        console.log(await signer.getAddress())
-                        await setIsAddress(true);
-                        // const meta = await axios.get(proposals[0]);
-                        // console.log(meta.data);
-                        // // convert the array to object
-                        const proposalObj = {
-                            uri: proposals[0],
-                            // worker: proposals[1],
-                            // bid: proposals[2].toNumber(),
-                            // motivation: meta.data.motivation,
-                            // proposalDescription: meta.data.proposalDetails,
-                            // setDisplayTaskDetails(proposalObj);
-                        }
-                        // Check if user's wallet address is same as worker address
+            console.log("proposalDetails" + proposalDetails);
 
-                        // if (account == proposalObj.worker) {
-                        //     setIsAddress(true);
-                        // }
-                        return proposalObj;
-                    }
-                }))
-            console.log(data);
-            // console.log(isAddress);
-            setProposalView(data);
-            // console.log(proposalView);
+            for (let i = 0; i < proposalDetails.length; i++) {
+                console.log(proposalDetails[i][3]);
+                console.log(await signer.getAddress());
+                if (proposalDetails[i][3] == (await signer.getAddress())) {
+                    await setIsWaiting(proposalDetails[i][0]);
+                    await setOnGoing(proposalDetails[i][1]);
+                    await setIsAddress(true);
+                    setProposalView(proposalDetails[i][3]);
+                }
+            }
+
+            // const data = await Promise.all(
+            //   proposalDetails.map(async (proposals) => {
+            //     console.log("proposals" + proposals);
+            //     if (proposals[3] == (await signer.getAddress())) {
+            //       await setIsWaiting(proposals[0]);
+            //       await setOnGoing(proposals[1]);
+
+            //       await setIsAddress(true);
+            //       const meta = await axios.get(proposals[2]);
+            //       // console.log(meta.data);
+            //       // // convert the array to object
+            //       const proposalObj = {
+            //         uri: proposals[2],
+            //         worker: proposals[3],
+            //         bid: proposals[4].toNumber(),
+            //         motivation: meta.data.motivation,
+            //         proposalDescription: meta.data.proposalDetails,
+            //       };
+            //       return proposalObj;
+            //     }
+            //   })
+            // );
+            // console.log("proposal data" + data);
+            // // console.log(isAddress);
+            // setProposalView(data);
+            // // console.log(proposalView);
         }
         getProposals();
-
     }, []);
-
 
     // const handleSubmit = async (event) => {
     //     event.preventDefault();
     //     console.log(proposal);
     // };
-    console.log(isAddress);
+    // console.log(isAddress);
+    console.log("proposalview" + typeof proposalView);
     return (
         <>
             <Head>
@@ -129,33 +145,31 @@ export default function TaskInfo() {
             <section className="bg-black text-white pb-6 px-10">
                 <h1 className="text-2xl font-bold my-2 md:ml-2">Project Details</h1>
                 <p className="text-sm md:ml-2 mt-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore atque ea aut error aliquam, molestiae ipsum perspiciatis exercitationem quisquam! Ducimus cupiditate dolore voluptates assumenda accusantium!
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore
+                    atque ea aut error aliquam, molestiae ipsum perspiciatis
+                    exercitationem quisquam! Ducimus cupiditate dolore voluptates
+                    assumenda accusantium!
                 </p>
                 <div className="py-7 h-96 w-9/12 border-2 border-slate-700 rounded-xl my-8 px-5">
-                    <div className='flex flex-col md:flex-row my-4'>
-                        <h3 className="text-lg font-semibold md:ml-2">
-                            Task Name:
-                        </h3>
+                    <div className="flex flex-col md:flex-row my-4">
+                        <h3 className="text-lg font-semibold md:ml-2">Task Name:</h3>
 
                         <p className="text-sm md:ml-2 mt-1">
                             {taskDisplayDetails.taskName}
                         </p>
                     </div>
-                    <div className='flex flex-col md:flex-row my-4'>
-                        <h3 className="text-lg font-semibold md:ml-2">
-                            Description:
-                        </h3>
+                    <div className="flex flex-col md:flex-row my-4">
+                        <h3 className="text-lg font-semibold md:ml-2">Description:</h3>
 
                         <p className="text-sm md:ml-2 mt-1">
                             {taskDisplayDetails.taskDescription}
                         </p>
                     </div>
-                    <div className='flex flex-col md:flex-row my-4'>
-                        <h3 className="text-lg font-semibold md:ml-2">
-                            Category:
-                        </h3>
+                    <div className="flex flex-col md:flex-row my-4">
+                        <h3 className="text-lg font-semibold md:ml-2">Category:</h3>
 
-                        <span className='
+                        <span
+                            className="
                             text-sm
                             md:ml-3
                             bg-slate-700
@@ -165,10 +179,12 @@ export default function TaskInfo() {
                             text-white
                             font-semibold
                             
-                        '>
+                        "
+                        >
                             UI/UX
                         </span>
-                        <span className='
+                        <span
+                            className="
                             text-sm
                             md:ml-2
                             bg-slate-700
@@ -178,39 +194,67 @@ export default function TaskInfo() {
                             text-white
                             font-semibold
                             
-                        '>
+                        "
+                        >
                             Web Development
                         </span>
                     </div>
-                    <div className='flex flex-col md:flex-row my-4'>
-                        <h3 className="text-lg font-semibold md:ml-2">
-                            Reward:
-                        </h3>
+                    <div className="flex flex-col md:flex-row my-4">
+                        <h3 className="text-lg font-semibold md:ml-2">Reward:</h3>
 
                         <p className="text-sm md:ml-2 mt-1">
-                            {
-                                taskDisplayDetails.stakedAmount
-                            }
+                            {taskDisplayDetails.stakedAmount}
                         </p>
                     </div>
-                    <div className='flex flex-col md:flex-row my-4'>
-                        <h3 className="text-lg font-semibold md:ml-2">
-                            Duration:
-                        </h3>
+                    <div className="flex flex-col md:flex-row my-4">
+                        <h3 className="text-lg font-semibold md:ml-2">Duration:</h3>
                         <p className="text-sm md:ml-2 mt-1">
-                            {
-                                taskDisplayDetails.taskDuration
-                            }
+                            {taskDisplayDetails.taskDuration}
                         </p>
                     </div>
                     {/* If the user's wallet address matches the worker address, then show the submit task button else show in progress */}
-                    {!isAddress ||
-                        proposalView.length === 0
-                        ? (
-                            <button
-                                onClick={() => setModal(true)}
-                                className='
-                        bg-[#0284c7]
+                    {/* {JSON.stringify(proposalView)} */}
+                    {proposalView.length == 0 && (
+                        <button
+                            onClick={() => setModal(true)}
+                            className="
+                          bg-[#0284c7]
+                          text-white
+                          font-semibold
+                          rounded-xl
+                          px-4
+                          py-2
+                          mt-4
+                          md:ml-2
+                      "
+                        >
+                            Submit Proposal
+                        </button>
+                    )}
+
+                    {isWaiting && (
+                        <h1 className="mt-10">
+                            <span
+                                className="
+                        bg-yellow-500
+                        text-black
+                        font-semibold
+                        rounded-xl
+                        px-4
+                        py-2
+                        mt-10
+                        md:ml-2
+                    "
+                            >
+                                Waiting
+                            </span>
+                        </h1>
+                    )}
+                    {onGoing && (
+                        <button
+                            onClick={() => setTaskModal(true)} // a different modal for submitting task
+                            className="
+                        bg-[#0b3044]
                         text-white
                         font-semibold
                         rounded-xl
@@ -218,19 +262,52 @@ export default function TaskInfo() {
                         py-2
                         mt-4
                         md:ml-2
-                    '>
-                                Submit Proposal
-                            </button>
-                        ) : (
-                            <h1 className="text-lg font-semibold md:ml-2">
-                                Status:
-                                <span className="text-sm md:ml-2 mt-1">
-                                    Waiting
-                                </span>
-                            </h1>
-                        )}
+                    "
+                        >
+                            Submit Task
+                        </button>
+                    )}
+                    {isCompleted && (
+                        <h1 className="mt-10">
+                            <span
+                                className="
+                        bg-green-700
+                        text-black
+                        font-semibold
+                        rounded-xl
+                        px-4
+                        py-2
+                        mt-10
+                        md:ml-2
+                    "
+                            >
+                                Completed, Waiting for review
+                            </span>
+                        </h1>
+                    )}
+                    {isReviewed && (
+                        <h1 className="mt-10">
+                            <span
+                                className="
+                        bg-green-300
+                        text-black
+                        font-semibold
+                        rounded-xl
+                        px-4
+                        py-2
+                        mt-10
+                        md:ml-2
+                    "
+                            >
+                                Completed Task
+                            </span>
+                        </h1>
+                    )}
                     {modal && <ProposalModal setModal={setModal} />}
-
+                    {taskModal && <TaskSubmitModal setTaskModal={setTaskModal}
+                        projectId={projectId}
+                        taskId={taskId}
+                    />}
                     {/* <button
                         onClick={() => setTaskModal(true)}
                         className='
@@ -251,5 +328,5 @@ export default function TaskInfo() {
                 </div>
             </section>
         </>
-    )
+    );
 }

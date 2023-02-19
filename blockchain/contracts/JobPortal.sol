@@ -19,7 +19,6 @@ contract JobPortal{
         uint proposalCount;
         bool completed;
         bool reviewed;
-        bool isWaiting;
         bool onGoing;
     }
 
@@ -81,7 +80,7 @@ contract JobPortal{
         return projects[projectId].taskCount;
     }
 
-    function getTaskData(uint projectId, uint taskId, address addr) public returns (
+    function getTaskData(uint projectId, uint taskId) public view returns (
         string memory taskURI,
         uint Id,
         uint stakedAmount,
@@ -89,24 +88,24 @@ contract JobPortal{
         address worker,
         bool isComplete,
         bool isReviewed,
-        bool isWaiting,
         bool onGoing
     ) {
         Task storage task = projects[projectId].tasks[taskId];
 
-        for (uint i = 0; i < task.proposalCount; i++) {
-            if (task.proposals[i].freelancer == addr && task.proposals[i].isWaiting) {
-                task.proposals[i].isWaiting = true;
-            }
-        }
+        // for (uint i = 0; i < task.proposalCount; i++) {
+        //     if (task.proposals[i].freelancer == addr && task.proposals[i].isWaiting) {
+        //         task.proposals[i].isWaiting = true;
+        //     }
+        // }
 
-        if (task.selectedWorker == addr) {
-            task.isWaiting = false;
-            task.onGoing = true;
-        }
+        // if (task.selectedWorker == addr) {
+        //     task.isWaiting = false;
+        //     task.onGoing = true;
+        // }
 
-        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed, task.isWaiting, task.onGoing);
+        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed, task.onGoing);
     }
+
 
 
     function createTask(uint projectId, uint stakedAmount, string calldata taskURI) public payable {
@@ -170,18 +169,27 @@ contract JobPortal{
             if (projects[projectId].tasks[taskId].proposals[i].freelancer == worker) {
                 projects[projectId].tasks[taskId].proposals[i].isWaiting = false;
                 projects[projectId].tasks[taskId].proposals[i].isAccepted = true;
+                projects[projectId].tasks[taskId].onGoing = true;
             } else {
                 projects[projectId].tasks[taskId].proposals[i].isAccepted = false;
             }
         }
 
-        emit WorkerSelected(projectId, taskId, worker);    
+        emit WorkerSelected(projectId, taskId, worker); 
     }
 
     function completeTaskWorker(uint projectId, uint taskId) public {
         require(msg.sender == projects[projectId].tasks[taskId].selectedWorker, "Only selected worker can complete the task");
 
+        projects[projectId].tasks[taskId].onGoing = false;
         projects[projectId].tasks[taskId].completed = true;
+        // set the states of the proposal of msg.sender to false
+        for (uint i = 0; i < projects[projectId].tasks[taskId].proposalCount; i++) {
+            if (projects[projectId].tasks[taskId].proposals[i].freelancer == msg.sender) {
+                projects[projectId].tasks[taskId].proposals[i].isWaiting = false;
+                projects[projectId].tasks[taskId].proposals[i].isAccepted = false;
+            }
+        }
 
         emit TaskCompleted(projectId, taskId);
     }
@@ -191,6 +199,7 @@ contract JobPortal{
         require(projects[projectId].tasks[taskId].completed, "Task is not completed yet");
 
         projects[projectId].tasks[taskId].reviewed = true;
+        projects[projectId].tasks[taskId].completed = false;
 
         emit ReviewCompleted(projectId, taskId);
     }
