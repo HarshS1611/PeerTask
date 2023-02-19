@@ -32,7 +32,7 @@ const MyProjectCard = ({ project }) => {
                             hover:bg-white hover:text-black
                             ">Edit Project</button>
                         </Link>
-                        <Link href={`/projectview/${project.id}`}>
+                        <Link href={`/myprojectview/${project.id}`}>
                             <button className="hidden md:inline-flex bg-transparent text-white text-lg px-5 py-2 border border-white-500 rounded-xl
                             hover:bg-white hover:text-black
                             ">View Project</button>

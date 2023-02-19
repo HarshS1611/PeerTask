@@ -19,9 +19,12 @@ contract JobPortal{
         uint proposalCount;
         bool completed;
         bool reviewed;
+        bool onGoing;
     }
 
     struct Proposal {
+        bool isWaiting;
+        bool isAccepted;
         string proposalURI;
         address freelancer;
         uint bidAmount;
@@ -30,7 +33,6 @@ contract JobPortal{
 
     struct Person {
         string personURI;
-        uint id;
         string name;
         string wallet_address;
         string description;
@@ -46,7 +48,7 @@ contract JobPortal{
     
     event NewProject(uint projectId, address projectManager, string projectURI);
     event NewTask(uint projectId, uint taskId, uint stakedAmount, string taskURI);
-    event NewProposal(uint projectId, uint taskId, address freelancer, uint bidAmount, string proposalURI);
+    event NewProposal(uint projectId, uint taskId, address freelancer, uint bidAmount, string proposalURI, bool isWaiting, bool isAccepted);
     event WorkerSelected(uint projectId, uint taskId, address worker);
     event TaskCompleted(uint projectId, uint taskId);
     event ReviewCompleted(uint projectId, uint taskId);
@@ -85,11 +87,25 @@ contract JobPortal{
         uint proposalCount,
         address worker,
         bool isComplete,
-        bool isReviewed
+        bool isReviewed,
+        bool onGoing
     ) {
         Task storage task = projects[projectId].tasks[taskId];
-        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed);
+
+        // for (uint i = 0; i < task.proposalCount; i++) {
+        //     if (task.proposals[i].freelancer == addr && task.proposals[i].isWaiting) {
+        //         task.proposals[i].isWaiting = true;
+        //     }
+        // }
+
+        // if (task.selectedWorker == addr) {
+        //     task.isWaiting = false;
+        //     task.onGoing = true;
+        // }
+
+        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed, task.onGoing);
     }
+
 
 
     function createTask(uint projectId, uint stakedAmount, string calldata taskURI) public payable {
@@ -119,9 +135,11 @@ contract JobPortal{
         projects[projectId].tasks[taskId].proposals[proposalCount].freelancer = msg.sender;
         projects[projectId].tasks[taskId].proposals[proposalCount].bidAmount = bidAmount;
         projects[projectId].tasks[taskId].proposals[proposalCount].motivation = motivation;
+        projects[projectId].tasks[taskId].proposals[proposalCount].isWaiting = true;
+        projects[projectId].tasks[taskId].proposals[proposalCount].isAccepted = false;
         projects[projectId].tasks[taskId].proposalCount++;
 
-        emit NewProposal(projectId, taskId, msg.sender, bidAmount, proposalURI);
+        emit NewProposal(projectId, taskId, msg.sender, bidAmount, proposalURI, true, false);
     }
 
     function getProposalsByTaskId(uint projectId, uint taskId) public view returns (Proposal[] memory) {
@@ -132,17 +150,46 @@ contract JobPortal{
         return proposals;
     }
 
+    function addPerson(string memory personURI, string memory name, string memory wallet_address, string memory description) public {
+        person[msg.sender].personURI = personURI;
+        person[msg.sender].name = name;
+        person[msg.sender].wallet_address = wallet_address;
+        person[msg.sender].description = description;
+        person[msg.sender].rating = 0;
+        person[msg.sender].total_projects = 0;
+        person[msg.sender].total_tasks = 0;
+    }
+
     function selectWorker(uint projectId, uint taskId, address worker) public {
         require(!projects[projectId].tasks[taskId].completed, "Task is already completed");
 
         projects[projectId].tasks[taskId].selectedWorker = worker;
-        emit WorkerSelected(projectId, taskId, worker);    
+
+        for (uint i = 0; i < projects[projectId].tasks[taskId].proposalCount; i++) {
+            if (projects[projectId].tasks[taskId].proposals[i].freelancer == worker) {
+                projects[projectId].tasks[taskId].proposals[i].isWaiting = false;
+                projects[projectId].tasks[taskId].proposals[i].isAccepted = true;
+                projects[projectId].tasks[taskId].onGoing = true;
+            } else {
+                projects[projectId].tasks[taskId].proposals[i].isAccepted = false;
+            }
+        }
+
+        emit WorkerSelected(projectId, taskId, worker); 
     }
 
     function completeTaskWorker(uint projectId, uint taskId) public {
         require(msg.sender == projects[projectId].tasks[taskId].selectedWorker, "Only selected worker can complete the task");
 
+        projects[projectId].tasks[taskId].onGoing = false;
         projects[projectId].tasks[taskId].completed = true;
+        // set the states of the proposal of msg.sender to false
+        for (uint i = 0; i < projects[projectId].tasks[taskId].proposalCount; i++) {
+            if (projects[projectId].tasks[taskId].proposals[i].freelancer == msg.sender) {
+                projects[projectId].tasks[taskId].proposals[i].isWaiting = false;
+                projects[projectId].tasks[taskId].proposals[i].isAccepted = false;
+            }
+        }
 
         emit TaskCompleted(projectId, taskId);
     }
@@ -152,6 +199,7 @@ contract JobPortal{
         require(projects[projectId].tasks[taskId].completed, "Task is not completed yet");
 
         projects[projectId].tasks[taskId].reviewed = true;
+        projects[projectId].tasks[taskId].completed = false;
 
         emit ReviewCompleted(projectId, taskId);
     }
@@ -165,6 +213,7 @@ contract JobPortal{
         address worker = projects[projectId].tasks[taskId].selectedWorker;
 
         payable(worker).transfer(stakedAmount);
+        projects[projectId].tasks[taskId].stakedAmount = 0;
 
         person[worker].rating += 1;
 
@@ -186,17 +235,25 @@ contract JobPortal{
     }
     
     // when bid is low
-    function refundStakedAmount(uint projectId, uint taskId) public {
+    function refundStakedAmount(uint projectId, uint taskId) public payable {
         require(msg.sender == projects[projectId].projectManager, "Only project manager can refund staked amount");
         require(!projects[projectId].tasks[taskId].completed, "Task is already completed");
 
+<<<<<<< HEAD
         //uint stakedAmount = projects[projectId].tasks[taskId].stakedAmount;
 
         //projects[projectId].tasks[taskId].stakedAmount -= msg.value;
+=======
+        projects[projectId].tasks[taskId].stakedAmount -= msg.value;
+>>>>>>> main
 
         //(bool sent, bytes memory data) = (address(msg.sender)).call{value: msg.value}("");
 
         //require(sent, "Not sent");
+    }
+
+    function getStakedAmount(uint projectId, uint taskId) public view returns(uint){
+        return projects[projectId].tasks[taskId].stakedAmount;
     }
     
 

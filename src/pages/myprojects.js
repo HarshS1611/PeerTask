@@ -3,11 +3,10 @@ import Header from '@/components/Header'
 import MyProjectCard from '@/components/MyProjectCard'
 import { useState, useEffect } from 'react'
 import Web3Modal from "web3modal";
+import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import axios from 'axios';
-import { ethers } from "ethers";
-import { authArcana } from '@/utils/authArcana';
 
 export default function Home() {
 

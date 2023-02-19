@@ -31,7 +31,9 @@ const Modal = ({
             const uri = await uploadToIPFS({ ...tasksData });
             console.log(uri)
             const stakedAmt = ethers.utils.parseEther(tasksData.stakedAmount);
-            const tx = await jobPortal.createTask(id, stakedAmt, uri);
+            const tx = await jobPortal.createTask(id, stakedAmt, uri, {
+                value: stakedAmt,
+            });
             await tx.wait();
             console.log("Task created!");
         } catch (err) {
