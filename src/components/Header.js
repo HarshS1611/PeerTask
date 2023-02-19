@@ -14,10 +14,10 @@ function Header() {
                 </Link>
                 {/* right */}
                 < div className="flex space-x-4 items-center justify-end text-gray-500" >
-                    {/* <button
+                    <button
                         onClick={() => Router.push('/createproject')}
                         className="hidden md:inline-flex bg-[#0284c7] text-white text-lg px-5 py-2 rounded-xl">Create Project</button>
-                    <button className="hidden md:inline-flex bg-transparent text-white text-lg px-5 py-2 border border-white-500 rounded-xl">Connect wallet</button> */}
+                    {/*<button className="hidden md:inline-flex bg-transparent text-white text-lg px-5 py-2 border border-white-500 rounded-xl">Connect wallet</button> */}
                     <button
                         onClick={() => Router.push('/myprojects')}
                         className="hidden md:flex items-center bg-transparent text-white text-lg px-5 py-2 border border-white-500 rounded-xl">
