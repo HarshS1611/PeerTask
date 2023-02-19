@@ -6,6 +6,9 @@ import { ethers } from "ethers";
 import { contractAddress } from "../../blockchain/config";
 import JobPortal from '../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json'
 import { uploadToIPFS, client } from '../utils/ipfs'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Router from 'next/router';
 import sendNotif from '../utils/notifications'
 import Router from 'next/router';
 
@@ -55,11 +58,6 @@ export default function CreateProject() {
             const tx = await jobPortal.createProject(uri);
             await tx.wait();
             console.log("Project created!");
-
-            // send notification to the manager
-            await sendNotif([await signer.getAddress()], `Project ${title} is added to PeerTask!`, `Project ${title} is now available for developers `)
-            Router.push('/myprojects')
-
         } catch (err) {
             console.log("Error: ", err);
         }
@@ -175,6 +173,7 @@ export default function CreateProject() {
 
                 </form>
             </div>
+            <ToastContainer />
 
         </>
 

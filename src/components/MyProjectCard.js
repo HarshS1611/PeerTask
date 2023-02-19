@@ -14,13 +14,9 @@ const MyProjectCard = ({ project }) => {
             </div>
             {/* Content div-RHS */}
             <div className='flex flex-col flex-grow pl-5'>
-                <div className='flex justify-between'>
-                    <p>location</p>
-                    {/* <HeartIcon className="h-7 cursor-pointer" /> */}
-                </div>
-                <h4 className="text-xl">{project.title}</h4>
+                <h4 className="text-2xl font-bold">{project.title}</h4>
                 <div className="border-b w-10 pt-2" />
-                <p className="pt-2 text-sm text-gray-500 flex-grow">{project.description}</p>
+                <p className="pt-2 text-lg text-white flex-grow">{project.description}</p>
 
                 {/* Price div */}
                 <div className="flex justify-between items-end pt-5">
