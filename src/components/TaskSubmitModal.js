@@ -5,6 +5,7 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json"
 import { contractAddress } from '../../blockchain/config';
+import sendNotif from '../utils/notifications'
 
 const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
     const [githubLink, setGithubLink] = useState('')

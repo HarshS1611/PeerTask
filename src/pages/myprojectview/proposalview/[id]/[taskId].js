@@ -12,6 +12,7 @@ import axios from "axios";
 import Image from "next/image";
 import ProposalCard from "@/components/ProposalCard";
 import sendNotif from "@/utils/notifications";
+import MyChat from "@/components/chat";
 
 export default function TaskInfo() {
   const { asPath } = useRouter();
@@ -286,6 +287,14 @@ export default function TaskInfo() {
           <p className="text-sm md:ml-2 mt-1">
             Congratulations! You have successfully completed the task.
           </p>
+        )}
+        {taskDisplayDetails.isComplete || taskDisplayDetails.onGoing ? (
+          <MyChat
+            account={address}
+            supportAddress={taskDisplayDetails.worker}
+          />
+        ) : (
+          <></>
         )}
       </section>
     </>

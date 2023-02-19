@@ -32,7 +32,7 @@ export default function ProjectCard({ project }) {
                         {
                             project.taskCount > 0 ?
                                 Array.from({ length: project.taskCount }, (_, i) => (
-                                    <FaStar className="text-white" />
+                                    <FaStar key="1" className="text-white" />
                                 )) : <h1 className="text-white font-semibold text-lg">No ratings</h1>
 
                         }
