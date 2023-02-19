@@ -175,7 +175,7 @@ contract JobPortal{
             }
         }
 
-        emit WorkerSelected(projectId, taskId, worker);    
+        emit WorkerSelected(projectId, taskId, worker); 
     }
 
     function completeTaskWorker(uint projectId, uint taskId) public {
