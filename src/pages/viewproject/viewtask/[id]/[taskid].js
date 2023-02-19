@@ -41,8 +41,9 @@ export default function TaskInfo() {
         signer
       );
       const task = await jobPortal.getTaskData(projectId, taskId);
-      await setIsCompleted(task[6]);
-      await setIsReviewed(task[7]);
+      console.log("task" + JSON.stringify(task));
+      await setIsCompleted(task[5]);
+      await setIsReviewed(task[6]);
 
       const meta = await axios.get(task[0]);
       // console.log(meta.data);
@@ -55,11 +56,12 @@ export default function TaskInfo() {
         worker: task[4],
         isComplete: task[5],
         isReviewed: task[6],
+        onGoing: task[7],
         taskName: meta.data.taskName,
         taskDescription: meta.data.taskDescription,
         taskDuration: meta.data.taskDuration,
       };
-      console.log(taskObj);
+      // console.log(taskObj);
       setDisplayTaskDetails(taskObj);
     }
     getTask();
@@ -83,32 +85,44 @@ export default function TaskInfo() {
         return;
       }
       console.log("proposalDetails" + proposalDetails);
-      const data = await Promise.all(
-        proposalDetails.map(async (proposals) => {
-          console.log("proposals" + proposals);
-          if (proposals[3] == (await signer.getAddress())) {
-            await setIsWaiting(proposals[0]);
-            await setOnGoing(proposals[1]);
 
-            await setIsAddress(true);
-            const meta = await axios.get(proposals[2]);
-            console.log(meta.data);
-            // // convert the array to object
-            const proposalObj = {
-              uri: proposals[2],
-              worker: proposals[3],
-              bid: proposals[4].toNumber(),
-              motivation: meta.data.motivation,
-              proposalDescription: meta.data.proposalDetails,
-            };
-            return proposalObj;
-          }
-        })
-      );
-      console.log(data);
-      // console.log(isAddress);
-      setProposalView(data);
-      // console.log(proposalView);
+      for (let i = 0; i < proposalDetails.length; i++) {
+        console.log(proposalDetails[i][3]);
+        console.log(await signer.getAddress());
+        if (proposalDetails[i][3] == (await signer.getAddress())) {
+          await setIsWaiting(proposalDetails[i][0]);
+          await setOnGoing(proposalDetails[i][1]);
+          await setIsAddress(true);
+          setProposalView(proposalDetails[i][3]);
+        }
+      }
+
+      // const data = await Promise.all(
+      //   proposalDetails.map(async (proposals) => {
+      //     console.log("proposals" + proposals);
+      //     if (proposals[3] == (await signer.getAddress())) {
+      //       await setIsWaiting(proposals[0]);
+      //       await setOnGoing(proposals[1]);
+
+      //       await setIsAddress(true);
+      //       const meta = await axios.get(proposals[2]);
+      //       // console.log(meta.data);
+      //       // // convert the array to object
+      //       const proposalObj = {
+      //         uri: proposals[2],
+      //         worker: proposals[3],
+      //         bid: proposals[4].toNumber(),
+      //         motivation: meta.data.motivation,
+      //         proposalDescription: meta.data.proposalDetails,
+      //       };
+      //       return proposalObj;
+      //     }
+      //   })
+      // );
+      // console.log("proposal data" + data);
+      // // console.log(isAddress);
+      // setProposalView(data);
+      // // console.log(proposalView);
     }
     getProposals();
   }, []);
@@ -117,7 +131,8 @@ export default function TaskInfo() {
   //     event.preventDefault();
   //     console.log(proposal);
   // };
-  console.log(isAddress);
+  // console.log(isAddress);
+  console.log("proposalview" + typeof proposalView);
   return (
     <>
       <Head>
@@ -198,37 +213,48 @@ export default function TaskInfo() {
             </p>
           </div>
           {/* If the user's wallet address matches the worker address, then show the submit task button else show in progress */}
+          {/* {JSON.stringify(proposalView)} */}
+          {proposalView.length == 0 && (
+            <button
+              onClick={() => setModal(true)}
+              className="
+                          bg-[#0284c7]
+                          text-white
+                          font-semibold
+                          rounded-xl
+                          px-4
+                          py-2
+                          mt-4
+                          md:ml-2
+                      "
+            >
+              Submit Proposal
+            </button>
+          )}
 
-          {!isAddress ||
-            (proposalView.length === 0 && (
-              <button
-                onClick={() => setModal(true)}
+          {isWaiting && (
+            <h1 className="mt-10">
+              <span
                 className="
-                        bg-[#0284c7]
-                        text-white
+                        bg-yellow-500
+                        text-black
                         font-semibold
                         rounded-xl
                         px-4
                         py-2
-                        mt-4
+                        mt-10
                         md:ml-2
                     "
               >
-                Submit Proposal
-              </button>
-            ))}
-
-          {isWaiting && (
-            <h1 className="text-lg font-semibold md:ml-2">
-              Status:
-              <span className="text-sm md:ml-2 mt-1">Waiting</span>
+                Waiting
+              </span>
             </h1>
           )}
           {onGoing && (
             <button
               onClick={() => setModal(true)} // a different modal for submitting task
               className="
-                        bg-[#0284c7]
+                        bg-[#0b3044]
                         text-white
                         font-semibold
                         rounded-xl
@@ -242,17 +268,39 @@ export default function TaskInfo() {
             </button>
           )}
           {isCompleted && (
-            <h1 className="text-lg font-semibold md:ml-2">
-              Status:
-              <span className="text-sm md:ml-2 mt-1">
-                Completed, waiting for review
+            <h1 className="mt-10">
+              <span
+                className="
+                        bg-green-700
+                        text-black
+                        font-semibold
+                        rounded-xl
+                        px-4
+                        py-2
+                        mt-10
+                        md:ml-2
+                    "
+              >
+                Completed, Waiting for review
               </span>
             </h1>
           )}
           {isReviewed && (
-            <h1 className="text-lg font-semibold md:ml-2">
-              Status:
-              <span className="text-sm md:ml-2 mt-1">Reviewed and you earned</span>
+            <h1 className="mt-10">
+              <span
+                className="
+                        bg-green-300
+                        text-black
+                        font-semibold
+                        rounded-xl
+                        px-4
+                        py-2
+                        mt-10
+                        md:ml-2
+                    "
+              >
+                Completed Task
+              </span>
             </h1>
           )}
           {modal && <ProposalModal setModal={setModal} />}
