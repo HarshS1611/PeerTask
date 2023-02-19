@@ -39,7 +39,7 @@ export default function TaskInfo() {
             signer
         );
         await getTask(jobPortal);
-        await getProposals(jobPortal);
+        await getProposals(jobPortal, signer);
         setIsAddress(await signer.getAddress());
     }
 
@@ -71,7 +71,7 @@ export default function TaskInfo() {
         setDisplayTaskDetails(taskObj);
     }
 
-    async function getProposals(jobPortal) {
+    async function getProposals(jobPortal, signer) {
         const proposalDetails = await jobPortal.getProposalsByTaskId(
             projectId,
             taskId
@@ -214,7 +214,7 @@ export default function TaskInfo() {
                     </div>
                     {/* If the user's wallet address matches the worker address, then show the submit task button else show in progress */}
                     {/* {JSON.stringify(proposalView)} */}
-                    {proposalView.length == 0 && (
+                    {proposalView.length == 0 && !onGoing && !isCompleted && (
                         <button
                             onClick={() => setModal(true)}
                             className="
