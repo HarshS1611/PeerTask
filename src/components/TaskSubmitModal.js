@@ -5,6 +5,7 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import JobPortal from "../../blockchain/artifacts/contracts/JobPortal.sol/JobPortal.json"
 import { contractAddress } from '../../blockchain/config';
+import sendNotif from '../utils/notifications'
 import { useAuth } from "@arcana/auth-react";
 
 const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
@@ -27,7 +28,7 @@ const TaskSubmitModal = ({ setTaskModal, projectId, taskId }) => {
             const jobPortal = new ethers.Contract(contractAddress, JobPortal.abi, sig);
             const uri = await uploadToIPFS({ githubLink, comments, deployedLink });
             console.log(uri)
-            const tx = await jobPortal.completeTaskWorker(projectId, taskId);
+            const tx = await jobPortal.completeTaskWorker(projectId, taskId, uri);
             await tx.wait();
             console.log("Task completed!");
 

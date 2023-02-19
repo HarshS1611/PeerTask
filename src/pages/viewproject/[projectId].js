@@ -77,6 +77,7 @@ const ProjectInfo = () => {
                     taskName: meta.data.taskName,
                     taskDescription: meta.data.taskDescription,
                     taskDuration: meta.data.taskDuration,
+                    projectManager: projectData.manager
                 };
                 // convert the uri to specific details such as name and description
                 // console.log(taskObj.uri);

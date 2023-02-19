@@ -20,6 +20,7 @@ contract JobPortal{
         bool completed;
         bool reviewed;
         bool onGoing;
+        string submissionURI;
     }
 
     struct Proposal {
@@ -88,7 +89,8 @@ contract JobPortal{
         address worker,
         bool isComplete,
         bool isReviewed,
-        bool onGoing
+        bool onGoing,
+        string memory submissionURI
     ) {
         Task storage task = projects[projectId].tasks[taskId];
 
@@ -103,7 +105,7 @@ contract JobPortal{
         //     task.onGoing = true;
         // }
 
-        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed, task.onGoing);
+        return (task.taskURI, task.taskId, task.stakedAmount, task.proposalCount, task.selectedWorker, task.completed, task.reviewed, task.onGoing, task.submissionURI);
     }
 
 
@@ -178,11 +180,12 @@ contract JobPortal{
         emit WorkerSelected(projectId, taskId, worker); 
     }
 
-    function completeTaskWorker(uint projectId, uint taskId) public {
+    function completeTaskWorker(uint projectId, uint taskId, string calldata submissionURI) public {
         require(msg.sender == projects[projectId].tasks[taskId].selectedWorker, "Only selected worker can complete the task");
 
         projects[projectId].tasks[taskId].onGoing = false;
         projects[projectId].tasks[taskId].completed = true;
+        projects[projectId].tasks[taskId].submissionURI = submissionURI;
         // set the states of the proposal of msg.sender to false
         for (uint i = 0; i < projects[projectId].tasks[taskId].proposalCount; i++) {
             if (projects[projectId].tasks[taskId].proposals[i].freelancer == msg.sender) {

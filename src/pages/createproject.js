@@ -2,7 +2,7 @@ import Header from '@/components/Header'
 import { useState } from 'react'
 import Head from 'next/head'
 import Web3Modal from "web3modal";
-import { Auth, useAuth } from "@arcana/auth-react";
+
 
 import { ethers } from "ethers";
 

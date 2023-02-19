@@ -40,8 +40,8 @@ const ProjectInfo = () => {
             </Head>
             <Header />
             {/* A button to go back to the previous page */}
-            <GoBackbtn />
             <section className="bg-black text-white pb-6 px-10">
+                <GoBackbtn />
                 <h1 className="text-2xl font-bold my-2 md:ml-2">Project Info</h1>
                 <div className='bg-[#1a1e27] rounded-xl p-5 mt-5'>
                     <div className='flex flex-col md:flex-row my-2'>
